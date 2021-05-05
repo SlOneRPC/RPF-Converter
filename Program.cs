@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CodeWalker.GameFiles;
 namespace ResourceCreator
 {
@@ -88,10 +89,10 @@ namespace ResourceCreator
             // Process the list of files found in the directory.
             string[] fileEntries = Directory.GetFiles(targetDirectory);
             foreach (string fileName in fileEntries)
-                if (move)
-                    ProcessMoveFile(fileName);
-                else
-                    ProcessFile(fileName);
+                    if (move)
+                        ProcessMoveFile(fileName);
+                    else
+                        ProcessFile(fileName);
 
             // Recurse into subdirectories of this directory.
             string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
@@ -213,7 +214,31 @@ namespace ResourceCreator
             }
         }
 
+        public static void MoveDirectory(string source, string target)
+        {
+            var sourcePath = source.TrimEnd('\\', ' ');
+            var targetPath = target.TrimEnd('\\', ' ');
+            var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories).GroupBy(s => Path.GetDirectoryName(s));
+            foreach (var folder in files)
+            {
+                var targetFolder = folder.Key.Replace(sourcePath, targetPath);
+                Directory.CreateDirectory(targetFolder);
+                foreach (var file in folder)
+                {
+                    try
+                    {
+                        var targetFile = Path.Combine(targetFolder, Path.GetFileName(file));
+                        if (File.Exists(targetFile)) File.Delete(targetFile);
+                        File.Move(file, targetFile);
+                    }
+                    catch (Exception)
+                    {
 
+                    }
+                }
+            }
+            Directory.Delete(source, true);
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to resource creator!");
@@ -225,30 +250,46 @@ namespace ResourceCreator
                 Directory.CreateDirectory("./input");
             }
 
-            if (Directory.Exists("./rpf-extracted"))
-            {
-                Directory.Delete("./rpf-extracted", true);
-
-                Directory.CreateDirectory("./rpf-extracted");
-            }
-            else
-            {
-                Directory.CreateDirectory("./rpf-extracted");
-            }
-
+          
             if (Directory.Exists("./resource"))
             {
                 Directory.Delete("./resource", true);
             }
 
-            ProcessDirectory("./input", false);
+            while (true) 
+            {
+                if (Directory.Exists("./rpf-extracted"))
+                {
+                    Directory.Delete("./rpf-extracted", true);
 
+                    Directory.CreateDirectory("./rpf-extracted");
+                }
+                else
+                {
+                    Directory.CreateDirectory("./rpf-extracted");
+                }
+
+                ProcessDirectory("./input", false);
+
+                MoveDirectory(".\\input", ".\\old-inputs");
+
+                Directory.CreateDirectory("./input");
+
+                Console.WriteLine("Type exit to finish or anything else to continue once file is in place");
+                if (Console.ReadLine().ToLower().Equals("exit"))
+                    break;
+            }
 
             // Write memes to file
             string textOutput = "";
             foreach (KeyValuePair<string, string> modelName in modelNames)
             {
-                textOutput += $"AddTextEntry(\"{modelName.Key}\", \"{modelName.Value}\") \n\"{modelName.Key}\": \"{modelName.Value}\" \n\n";
+                textOutput += $"AddTextEntry(\"{modelName.Key}\", \"{modelName.Value}\")\n";
+            }
+            textOutput += "\n";
+            foreach (KeyValuePair<string, string> modelName in modelNames)
+            {
+                textOutput += $"\"{modelName.Key}\": \"{modelName.Value}\"\n";
             }
             File.WriteAllText("./resource\\output.txt", textOutput);
 
