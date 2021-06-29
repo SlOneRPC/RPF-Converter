@@ -160,7 +160,7 @@ namespace CodeWalker.GameFiles
             return tex;
         }
 
-        private void BuildDict()
+        public void BuildDict()
         {
             var dict = new Dictionary<uint, Texture>();
             if ((Textures?.data_items != null) && (TextureNameHashes?.data_items != null))

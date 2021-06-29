@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using CodeWalker.GameFiles;
+using CodeWalker.Utils;
 namespace ResourceCreator
 {
     class Program
@@ -10,7 +13,7 @@ namespace ResourceCreator
         static Dictionary<string, string[]> extensions = new Dictionary<string, string[]>()
         {
             { "meta",  new string[]{ ".meta", "clip_sets.xml" } },
-            { "stream", new string[]{".ytd", ".yft" } }
+            { "stream", new string[]{".ytd", ".yft", ".ydr" } }
         };
 
         static Dictionary<string, string> modelNames = new Dictionary<string, string>();
@@ -179,8 +182,82 @@ namespace ResourceCreator
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Resource meme -> " + entry.NameLower);
-                                    File.WriteAllBytes(directoryOffset + entry.NameLower, data);
+                                    Console.WriteLine("Potential meme -> " + entry.NameLower);
+                                    foreach (KeyValuePair<string, string[]> extentionMap in extensions)
+                                    {
+                                        foreach (string extention in extentionMap.Value)
+                                        {
+                                            if (entry.NameLower.EndsWith(extention))
+                                            {
+                                                Console.WriteLine("Resource meme -> " + entry.NameLower);
+
+                                                if (extention.Equals(".ytd"))
+                                                {
+                                                    RpfFileEntry rpfent = entry as RpfFileEntry;
+
+                                                    byte[] ytddata = rpfent.File.ExtractFile(rpfent);
+
+                                                    YtdFile ytd = new YtdFile();
+                                                    ytd.Load(ytddata, rpfent);
+
+                                                    Dictionary<uint, Texture> Dicts = new Dictionary<uint, Texture>();
+
+                                                    foreach (KeyValuePair<uint, Texture> texture in ytd.TextureDict.Dict)
+                                                    {
+                                                        if (texture.Value.Width > 1440) // Only resize if it is greater than 1440p
+                                                        {
+                                                            byte[] dds = DDSIO.GetDDSFile(texture.Value);
+                                                            File.WriteAllBytes("./NConvert/" + texture.Value.Name + ".dds", dds);
+
+                                                            Process p = new Process();
+                                                            p.StartInfo.FileName = @"./NConvert/nconvert.exe";
+                                                            p.StartInfo.Arguments = $"-out dds -resize 50% 50% -overwrite ./NConvert/{texture.Value.Name}.dds";
+                                                            p.StartInfo.UseShellExecute = false;
+                                                            p.StartInfo.RedirectStandardOutput = true;
+                                                            p.Start();
+
+                                                            //Wait for the process to end.
+                                                            p.WaitForExit();
+
+                                                            // Move file back
+                                                            File.Move("./NConvert/" + texture.Value.Name + ".dds", directoryOffset + texture.Value.Name + ".dds");
+
+                                                            byte[] resizedData = File.ReadAllBytes(directoryOffset + texture.Value.Name + ".dds");
+                                                            Texture resizedTex = DDSIO.GetTexture(resizedData);
+                                                            resizedTex.Name = texture.Value.Name;
+                                                            Console.WriteLine(resizedData.Length.ToString());
+                                                            Dicts.Add(texture.Key, resizedTex);
+
+                                                            // Yeet the file, we are done with it
+                                                            File.Delete(directoryOffset + texture.Value.Name + ".dds");
+                                                        }
+                                                    }
+                                                    // No point rebuilding the ytd when nothing was resized
+                                                    if (Dicts.Count < 1)
+                                                        break;
+
+                                                    TextureDictionary dic = new TextureDictionary();
+                                                    dic.Textures = new ResourcePointerList64<Texture>();
+                                                    dic.TextureNameHashes = new ResourceSimpleList64_uint();
+                                                    dic.Textures.data_items = Dicts.Values.ToArray();
+                                                    dic.TextureNameHashes.data_items = Dicts.Keys.ToArray();
+
+                                                    dic.BuildDict();
+                                                    ytd.TextureDict = dic;
+
+                                                    byte[] resizedYtdData = ytd.Save();
+                                                    File.WriteAllBytes(directoryOffset + entry.NameLower, resizedYtdData);
+
+                                                    Console.WriteLine("Done some ytd resize memes -> " + entry.NameLower);
+                                                    break;
+                                                }
+
+                                                File.WriteAllBytes(directoryOffset + entry.NameLower, data);
+                                                break;
+                                            }
+                                        }
+                                    }
+
                                     if (entry.NameLower.EndsWith(".ytd"))
                                     {
                                         latestModelName = entry.NameLower.Remove(entry.NameLower.Length - 4);
@@ -208,9 +285,10 @@ namespace ResourceCreator
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 Console.WriteLine("Exception memes!");
+                Console.WriteLine(e.Message);
             }
         }
 
