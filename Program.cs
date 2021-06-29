@@ -197,6 +197,8 @@ namespace ResourceCreator
 
                                                     byte[] ytddata = rpfent.File.ExtractFile(rpfent);
 
+                                                    bool needsResized = ytddata.Length > 5242880; // 5MB
+
                                                     YtdFile ytd = new YtdFile();
                                                     ytd.Load(ytddata, rpfent);
 
@@ -205,14 +207,18 @@ namespace ResourceCreator
                                                     bool somethingResized = false;
                                                     foreach (KeyValuePair<uint, Texture> texture in ytd.TextureDict.Dict)
                                                     {
-                                                        if (texture.Value.Width > 1440) // Only resize if it is greater than 1440p
+                                                        if (texture.Value.Width > 1440 || needsResized && texture.Value.Width > 550) // Only resize if it is greater than 1440p or 550p if vehicle is oversized
                                                         {
                                                             byte[] dds = DDSIO.GetDDSFile(texture.Value);
-                                                            File.WriteAllBytes("./NConvert/" + texture.Value.Name + ".dds", dds);
+
+                                                            string fileName = $"{texture.Value.Name}.dds";
+                                                            fileName = String.Concat(fileName.Where(c => !Char.IsWhiteSpace(c)));
+
+                                                            File.WriteAllBytes("./NConvert/" + fileName, dds);
 
                                                             Process p = new Process();
                                                             p.StartInfo.FileName = @"./NConvert/nconvert.exe";
-                                                            p.StartInfo.Arguments = $"-out dds -resize 50% 50% -overwrite ./NConvert/{texture.Value.Name}.dds";
+                                                            p.StartInfo.Arguments = @"-out dds -resize 50% 50% -overwrite ./NConvert/" + fileName;
                                                             p.StartInfo.UseShellExecute = false;
                                                             p.StartInfo.RedirectStandardOutput = true;
                                                             p.Start();
@@ -221,16 +227,16 @@ namespace ResourceCreator
                                                             p.WaitForExit();
 
                                                             // Move file back
-                                                            File.Move("./NConvert/" + texture.Value.Name + ".dds", directoryOffset + texture.Value.Name + ".dds");
+                                                            File.Move("./NConvert/" + fileName, directoryOffset + fileName);
 
-                                                            byte[] resizedData = File.ReadAllBytes(directoryOffset + texture.Value.Name + ".dds");
+                                                            byte[] resizedData = File.ReadAllBytes(directoryOffset + fileName);
                                                             Texture resizedTex = DDSIO.GetTexture(resizedData);
                                                             resizedTex.Name = texture.Value.Name;
                                                             Console.WriteLine(resizedData.Length.ToString());
                                                             Dicts.Add(texture.Key, resizedTex);
 
                                                             // Yeet the file, we are done with it
-                                                            File.Delete(directoryOffset + texture.Value.Name + ".dds");
+                                                            File.Delete(directoryOffset + fileName);
                                                             somethingResized = true;
                                                         }
                                                         else
