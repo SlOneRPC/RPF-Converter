@@ -202,6 +202,7 @@ namespace ResourceCreator
 
                                                     Dictionary<uint, Texture> Dicts = new Dictionary<uint, Texture>();
 
+                                                    bool somethingResized = false;
                                                     foreach (KeyValuePair<uint, Texture> texture in ytd.TextureDict.Dict)
                                                     {
                                                         if (texture.Value.Width > 1440) // Only resize if it is greater than 1440p
@@ -230,10 +231,15 @@ namespace ResourceCreator
 
                                                             // Yeet the file, we are done with it
                                                             File.Delete(directoryOffset + texture.Value.Name + ".dds");
+                                                            somethingResized = true;
+                                                        }
+                                                        else
+                                                        {
+                                                            Dicts.Add(texture.Key, texture.Value);
                                                         }
                                                     }
                                                     // No point rebuilding the ytd when nothing was resized
-                                                    if (Dicts.Count < 1)
+                                                    if (!somethingResized)
                                                         break;
 
                                                     TextureDictionary dic = new TextureDictionary();
