@@ -51,6 +51,11 @@ namespace ResourceCreatorv2
             return e;
         }
 
+        private static double ConvertBytesToMegabytes(long bytes)
+        {
+            return (bytes / 1024f) / 1024f;
+        }
+
         public static byte[] DoResizing(YtdFile ytd, bool needsForcedResized)
         {
             Dictionary<uint, Texture> Dicts = new Dictionary<uint, Texture>();
@@ -81,11 +86,12 @@ namespace ResourceCreatorv2
 
                         // Move file back
                         File.Move("./NConvert/" + fileName, "./rpf-extracted/" + fileName);
-
+                      
                         byte[] resizedData = File.ReadAllBytes("./rpf-extracted/" + fileName);
                         Texture resizedTex = DDSIO.GetTexture(resizedData);
                         resizedTex.Name = texture.Value.Name;
-                        Console.WriteLine(resizedData.Length.ToString());
+                        Console.WriteLine($"before -> {ConvertBytesToMegabytes(dds.Length).ToString("#.##")}MB");
+                        Console.WriteLine($"after -> {ConvertBytesToMegabytes(resizedData.Length).ToString("#.##")}MB");
                         Dicts.Add(texture.Key, resizedTex);
 
                         // Yeet the file, we are done with it
@@ -143,13 +149,7 @@ namespace ResourceCreatorv2
                 textOutput += $"{modelName.Value}\n";
             }
 
-            int prefix = 1;
-            while (File.Exists($"./resource\\output{prefix}.txt"))
-            {
-                prefix++;
-            }
-
-            File.WriteAllText($"./resource\\output{prefix}.txt", textOutput);
+            File.WriteAllText("./resource\\output.txt", textOutput);
         }
     }
 }

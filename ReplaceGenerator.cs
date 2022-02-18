@@ -47,12 +47,18 @@ namespace ResourceCreatorv2
                                 while (true)
                                 {
                                     modelName = convertForm.requestInput($"Input model name name for {oldModelName}:");
+                                   
                                     if (!Directory.Exists($"./resource\\meta\\{modelName}"))
                                     {
-                                        break;
+                                        if (convertForm.getRootDir().Length < 1 || !Misc.checkRootForModelName(modelName, convertForm.getRootDir()))
+                                            break;
+                                        else
+                                            convertForm.errorMsg("This model name is already in use in root dir!");
                                     }
-
-                                    convertForm.errorMsg("This model has already been converted!");
+                                    else
+                                    {
+                                        convertForm.errorMsg("This model has already been converted!");
+                                    }
                                 }
 
                                 string vehicleName = convertForm.requestInput($"Input vehicle name for {modelName}:");

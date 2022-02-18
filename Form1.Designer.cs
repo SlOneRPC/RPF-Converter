@@ -34,6 +34,9 @@
             this.replacebtn = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.addongroup = new System.Windows.Forms.GroupBox();
+            this.browseBtn = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.rootDirtxb = new System.Windows.Forms.TextBox();
             this.fileslist = new System.Windows.Forms.ListBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.errorlbl = new System.Windows.Forms.Label();
@@ -41,19 +44,12 @@
             this.namelbl = new System.Windows.Forms.Label();
             this.nametxb = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.replacegroup = new System.Windows.Forms.GroupBox();
-            this.filesreplace = new System.Windows.Forms.ListBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.replaceErrorMsg = new System.Windows.Forms.Label();
-            this.replaceStartbtn = new System.Windows.Forms.Button();
-            this.replacelbl = new System.Windows.Forms.Label();
-            this.replacetxb = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.fileTicker = new System.Windows.Forms.Timer(this.components);
+            this.enginebtn = new System.Windows.Forms.Button();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.modkitbtn = new System.Windows.Forms.Button();
             this.addongroup.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.replacegroup.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -98,24 +94,59 @@
             // 
             // addongroup
             // 
+            this.addongroup.Controls.Add(this.browseBtn);
+            this.addongroup.Controls.Add(this.label4);
+            this.addongroup.Controls.Add(this.rootDirtxb);
             this.addongroup.Controls.Add(this.fileslist);
             this.addongroup.Controls.Add(this.panel1);
             this.addongroup.Controls.Add(this.label3);
             this.addongroup.Location = new System.Drawing.Point(13, 117);
             this.addongroup.Name = "addongroup";
-            this.addongroup.Size = new System.Drawing.Size(556, 218);
+            this.addongroup.Size = new System.Drawing.Size(556, 246);
             this.addongroup.TabIndex = 4;
             this.addongroup.TabStop = false;
             this.addongroup.Text = "Addon Vehicles";
+            // 
+            // browseBtn
+            // 
+            this.browseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.browseBtn.Location = new System.Drawing.Point(464, 206);
+            this.browseBtn.Name = "browseBtn";
+            this.browseBtn.Size = new System.Drawing.Size(68, 29);
+            this.browseBtn.TabIndex = 8;
+            this.browseBtn.Text = "Browse";
+            this.browseBtn.UseVisualStyleBackColor = true;
+            this.browseBtn.Click += new System.EventHandler(this.browseBtn_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(237, 189);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(186, 19);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Vehicles Root Directory:";
+            // 
+            // rootDirtxb
+            // 
+            this.rootDirtxb.Enabled = false;
+            this.rootDirtxb.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.rootDirtxb.Location = new System.Drawing.Point(234, 211);
+            this.rootDirtxb.Multiline = true;
+            this.rootDirtxb.Name = "rootDirtxb";
+            this.rootDirtxb.Size = new System.Drawing.Size(230, 24);
+            this.rootDirtxb.TabIndex = 6;
+            this.rootDirtxb.TextChanged += new System.EventHandler(this.rootDirtxb_TextChanged);
             // 
             // fileslist
             // 
             this.fileslist.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fileslist.FormattingEnabled = true;
             this.fileslist.ItemHeight = 21;
-            this.fileslist.Location = new System.Drawing.Point(13, 42);
+            this.fileslist.Location = new System.Drawing.Point(6, 42);
             this.fileslist.Name = "fileslist";
-            this.fileslist.Size = new System.Drawing.Size(197, 151);
+            this.fileslist.Size = new System.Drawing.Size(211, 193);
             this.fileslist.TabIndex = 7;
             // 
             // panel1
@@ -177,115 +208,49 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 25);
+            this.label3.Location = new System.Drawing.Point(6, 25);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(83, 13);
             this.label3.TabIndex = 1;
             this.label3.Text = "Files to Convert:";
-            // 
-            // replacegroup
-            // 
-            this.replacegroup.Controls.Add(this.filesreplace);
-            this.replacegroup.Controls.Add(this.panel2);
-            this.replacegroup.Controls.Add(this.label6);
-            this.replacegroup.Location = new System.Drawing.Point(14, 117);
-            this.replacegroup.Name = "replacegroup";
-            this.replacegroup.Size = new System.Drawing.Size(570, 228);
-            this.replacegroup.TabIndex = 8;
-            this.replacegroup.TabStop = false;
-            this.replacegroup.Text = "Replace Vehicles";
-            this.replacegroup.Visible = false;
-            // 
-            // filesreplace
-            // 
-            this.filesreplace.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.filesreplace.FormattingEnabled = true;
-            this.filesreplace.ItemHeight = 21;
-            this.filesreplace.Location = new System.Drawing.Point(13, 42);
-            this.filesreplace.Name = "filesreplace";
-            this.filesreplace.Size = new System.Drawing.Size(197, 151);
-            this.filesreplace.TabIndex = 7;
-            // 
-            // panel2
-            // 
-            this.panel2.Controls.Add(this.replaceErrorMsg);
-            this.panel2.Controls.Add(this.replaceStartbtn);
-            this.panel2.Controls.Add(this.replacelbl);
-            this.panel2.Controls.Add(this.replacetxb);
-            this.panel2.Location = new System.Drawing.Point(219, 25);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(327, 145);
-            this.panel2.TabIndex = 6;
-            // 
-            // replaceErrorMsg
-            // 
-            this.replaceErrorMsg.BackColor = System.Drawing.Color.Transparent;
-            this.replaceErrorMsg.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.replaceErrorMsg.Font = new System.Drawing.Font("Rockwell", 11.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.replaceErrorMsg.ForeColor = System.Drawing.Color.Red;
-            this.replaceErrorMsg.Location = new System.Drawing.Point(0, 124);
-            this.replaceErrorMsg.Name = "replaceErrorMsg";
-            this.replaceErrorMsg.Size = new System.Drawing.Size(327, 21);
-            this.replaceErrorMsg.TabIndex = 5;
-            this.replaceErrorMsg.Text = "error msg";
-            this.replaceErrorMsg.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.replaceErrorMsg.Visible = false;
-            // 
-            // replaceStartbtn
-            // 
-            this.replaceStartbtn.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.replaceStartbtn.Location = new System.Drawing.Point(15, 85);
-            this.replaceStartbtn.Name = "replaceStartbtn";
-            this.replaceStartbtn.Size = new System.Drawing.Size(298, 40);
-            this.replaceStartbtn.TabIndex = 4;
-            this.replaceStartbtn.Text = "Start Converting";
-            this.replaceStartbtn.UseVisualStyleBackColor = true;
-            this.replaceStartbtn.Click += new System.EventHandler(this.replaceStartbtn_Click);
-            // 
-            // replacelbl
-            // 
-            this.replacelbl.AutoSize = true;
-            this.replacelbl.Enabled = false;
-            this.replacelbl.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.replacelbl.Location = new System.Drawing.Point(11, 16);
-            this.replacelbl.Name = "replacelbl";
-            this.replacelbl.Size = new System.Drawing.Size(153, 19);
-            this.replacelbl.TabIndex = 3;
-            this.replacelbl.Text = "Input vehicle name:";
-            // 
-            // replacetxb
-            // 
-            this.replacetxb.Enabled = false;
-            this.replacetxb.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.replacetxb.Location = new System.Drawing.Point(15, 40);
-            this.replacetxb.Name = "replacetxb";
-            this.replacetxb.Size = new System.Drawing.Size(298, 29);
-            this.replacetxb.TabIndex = 2;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(13, 25);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(83, 13);
-            this.label6.TabIndex = 1;
-            this.label6.Text = "Files to Convert:";
             // 
             // fileTicker
             // 
             this.fileTicker.Interval = 500;
             this.fileTicker.Tick += new System.EventHandler(this.fileTicker_Tick);
             // 
+            // enginebtn
+            // 
+            this.enginebtn.Location = new System.Drawing.Point(380, 71);
+            this.enginebtn.Name = "enginebtn";
+            this.enginebtn.Size = new System.Drawing.Size(120, 33);
+            this.enginebtn.TabIndex = 5;
+            this.enginebtn.Text = "Engine Audio";
+            this.enginebtn.UseVisualStyleBackColor = true;
+            this.enginebtn.Visible = false;
+            this.enginebtn.Click += new System.EventHandler(this.enginebtn_Click);
+            // 
+            // modkitbtn
+            // 
+            this.modkitbtn.Location = new System.Drawing.Point(254, 71);
+            this.modkitbtn.Name = "modkitbtn";
+            this.modkitbtn.Size = new System.Drawing.Size(120, 33);
+            this.modkitbtn.TabIndex = 6;
+            this.modkitbtn.Text = "Modkit Fixer";
+            this.modkitbtn.UseVisualStyleBackColor = true;
+            this.modkitbtn.Click += new System.EventHandler(this.modkitbtn_Click);
+            // 
             // ResourceCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(577, 339);
+            this.ClientSize = new System.Drawing.Size(577, 375);
+            this.Controls.Add(this.modkitbtn);
+            this.Controls.Add(this.enginebtn);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.replacebtn);
             this.Controls.Add(this.addonbtn);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.replacegroup);
             this.Controls.Add(this.addongroup);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "ResourceCreator";
@@ -295,10 +260,6 @@
             this.addongroup.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.replacegroup.ResumeLayout(false);
-            this.replacegroup.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -319,14 +280,12 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Timer fileTicker;
         private System.Windows.Forms.ListBox fileslist;
-        private System.Windows.Forms.GroupBox replacegroup;
-        private System.Windows.Forms.ListBox filesreplace;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label replaceErrorMsg;
-        private System.Windows.Forms.Button replaceStartbtn;
-        private System.Windows.Forms.Label replacelbl;
-        private System.Windows.Forms.TextBox replacetxb;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Button enginebtn;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox rootDirtxb;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.Windows.Forms.Button browseBtn;
+        private System.Windows.Forms.Button modkitbtn;
     }
 }
 

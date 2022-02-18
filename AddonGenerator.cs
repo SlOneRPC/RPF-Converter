@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using CodeWalker.GameFiles;
 using CodeWalker.Utils;
@@ -22,6 +23,11 @@ namespace ResourceCreatorv2
 
         public static ResourceCreator convertForm;
 
+        // Model name replacement stuff
+        private static bool requiresModelRename = false;
+        private static string oldModelName = "";
+        private static string[] metasToReplace = new string[] { "vehicles.meta", "handling.meta", "carvariations.meta", "carcols.meta" };
+
         // Process files inside the subdirectories
         private static void ProcessMoveFile(string path)
         {
@@ -35,18 +41,71 @@ namespace ResourceCreatorv2
                         {
                             string[] divided = path.Split('\\');
 
+                            if (!modelNames.ContainsKey(latestModelName))
+                            {
+                                string updatedName = "";
+
+                                while (true)
+                                {
+                                    updatedName = convertForm.requestInput($"Change model or press next:", latestModelName);
+
+                                    if (!Directory.Exists($"./resource\\meta\\{updatedName}"))
+                                    {
+                                        if (convertForm.getRootDir().Length < 1 || !Misc.checkRootForModelName(updatedName, convertForm.getRootDir()))
+                                            break;
+                                        else
+                                            convertForm.errorMsg("This model name is already in use in root dir!");
+                                    }
+                                    else
+                                    {
+                                        convertForm.errorMsg("This model has already been converted!");
+                                    }
+                                }
+
+                                requiresModelRename = false;
+
+                                if (updatedName != latestModelName)
+                                {
+                                    requiresModelRename = true;
+                                    oldModelName = latestModelName.ToLower();
+                                    latestModelName = updatedName;
+                                }
+
+                                string vehicleName = convertForm.requestInput($"Input vehicle name for {latestModelName}:");
+                                modelNames.Add(latestModelName, vehicleName);
+                            }
+
                             if (!Directory.Exists($"./resource\\{extentionMap.Key}\\{latestModelName}"))
                             {
                                 Directory.CreateDirectory($"./resource\\{extentionMap.Key}\\{latestModelName}");
                             }
 
-                            if (!modelNames.ContainsKey(latestModelName))
+                            string file = divided[divided.Length - 1];
+
+                            if (requiresModelRename)
                             {
-                                string vehicleName = convertForm.requestInput($"Input vehicle name for {latestModelName}:");
-                                modelNames.Add(latestModelName, vehicleName);
+                                if (file.Contains(oldModelName))
+                                {
+                                    file = file.Replace(oldModelName, latestModelName);
+                                }
+                                else if (metasToReplace.Contains(file))
+                                {
+                                    string[] lines = File.ReadAllLines(path);
+
+                                    for (int i = 0; i < lines.Length; i++)
+                                    {
+                                        string line = lines[i].ToLower();
+                                        if (line.Contains(oldModelName))
+                                        {
+                                            lines[i] = Regex.Replace(lines[i], oldModelName, latestModelName, RegexOptions.IgnoreCase);
+                                        }
+                                    }
+
+                                    File.WriteAllLines(path, lines);
+                                }
                             }
 
-                            File.Move(path, $"./resource\\{extentionMap.Key}\\{latestModelName}\\{divided[divided.Length - 1]}");
+                            File.Move(path, $"./resource\\{extentionMap.Key}\\{latestModelName}\\{file}");
 
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("Moved file '{0}' -> {1}.", path, $"./resource/{extentionMap.Key}/{latestModelName}/{divided[divided.Length - 1]}");

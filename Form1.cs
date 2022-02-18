@@ -10,14 +10,24 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.IO;
+using static ResourceCreatorv2.Misc;
+using System.Xml.Serialization;
 
 namespace ResourceCreatorv2
 {
+    public enum Mode
+    {
+        addon,
+        replace,
+        audio,
+        modkit
+    }
     public partial class ResourceCreator : Form
     {
-        static bool converting1 = false;
-        static bool converting2 = false;
+        static bool converting = false;
         static string input = null;
+
+        static Mode currentMode = Mode.addon;
 
         public ResourceCreator()
         {
@@ -28,39 +38,44 @@ namespace ResourceCreatorv2
         {
             fileTicker.Interval = 1000;
             fileTicker.Start();
+
+            if (File.Exists("config.xml"))
+            {
+                string rootDir = "";
+                XmlSerializer ser = new XmlSerializer(typeof(string));
+                using (FileStream fs = File.OpenRead("config.xml"))
+                {
+                    rootDir = (string)ser.Deserialize(fs);
+                }
+
+                rootDirtxb.Text = rootDir;
+            }
         }
 
-        public string requestInput(string msg)
+        public string getRootDir()
         {
-            if (addongroup.Visible)
+            string text = null;
+            rootDirtxb.Invoke(new MethodInvoker(delegate
             {
-                namelbl.Invoke(new MethodInvoker(delegate
-                {
-                    namelbl.Enabled = true;
-                    namelbl.Text = msg;
+                text = rootDirtxb.Text;
+            }));
+            return text;
+        }
 
-                    nametxb.Enabled = true;
-                    nametxb.Text = "";
-
-                    convertbtn.Enabled = true;
-                    convertbtn.Text = "Next";
-                }));
-            }
-            else
+        public string requestInput(string msg, string defaultValue = "")
+        {
+            namelbl.Invoke(new MethodInvoker(delegate
             {
-                replacelbl.Invoke(new MethodInvoker(delegate
-                {
-                    replacelbl.Enabled = true;
-                    replacelbl.Text = msg;
+                namelbl.Enabled = true;
+                namelbl.Text = msg;
 
-                    replacetxb.Enabled = true;
-                    replacetxb.Text = "";
+                nametxb.Enabled = true;
+                nametxb.Text = defaultValue;
 
-                    replaceStartbtn.Enabled = true;
-                    replaceStartbtn.Text = "Next";
-                }));
-            }
-
+                convertbtn.Enabled = true;
+                convertbtn.Text = "Next";
+            }));
+            
             input = null;
             while (input == null)
             {
@@ -72,66 +87,57 @@ namespace ResourceCreatorv2
 
         public void convertComplete()
         {
-            if (addongroup.Visible)
+            namelbl.Invoke(new MethodInvoker(delegate
             {
-                namelbl.Invoke(new MethodInvoker(delegate
+                namelbl.Enabled = false;
+                namelbl.Text = $"Input vehicle name:";
+
+                nametxb.Enabled = false;
+                nametxb.Text = "";
+
+                convertbtn.Enabled = true;
+                convertbtn.Text = "Start Converting";
+
+                if (currentMode.Equals(Mode.modkit) && rootDirtxb.Text.Length > 1)
                 {
-                    namelbl.Enabled = false;
-                    namelbl.Text = $"Input vehicle name:";
-
-                    nametxb.Enabled = false;
-                    nametxb.Text = "";
-
-                    convertbtn.Enabled = true;
-                    convertbtn.Text = "Start Converting";
-                }));
-                converting1 = false;
-            }
-            else
-            {
-                replacelbl.Invoke(new MethodInvoker(delegate
-                {
-                    replacelbl.Enabled = false;
-                    replacelbl.Text = $"Input vehicle name:";
-
-                    replacetxb.Enabled = false;
-                    replacetxb.Text = "";
-
-                    replaceStartbtn.Enabled = true;
-                    replaceStartbtn.Text = "Start Converting";
-                }));
-                converting2 = false;
-            }
+                    fileslist.Items.Clear();
+                    populateModKits(Misc.checkRootForDuplicateModKit(rootDirtxb.Text));
+                }
+            }));
+            converting = false;
         }
 
         public void errorMsg(string message)
         {
-            if (addongroup.Visible)
+            errorlbl.Invoke(new MethodInvoker(delegate
             {
-                errorlbl.Invoke(new MethodInvoker(delegate
-                {
-                    errorlbl.Text = message;
-                    errorlbl.Visible = true;
-                }));
-            }
-            else
-            {
-                errorlbl.Invoke(new MethodInvoker(delegate
-                {
-                    replaceErrorMsg.Text = message;
-                    replaceErrorMsg.Visible = true;
-                }));
-            }
+                errorlbl.Text = message;
+                errorlbl.Visible = true;
+            }));
         }
 
         private void convertbtn_Click(object sender, EventArgs e)
         {
-            if (!converting1)
+            if (!converting)
             {
-                converting1 = true;
+                converting = true;
                 errorlbl.Visible = false;
-                Thread newThread = new Thread(AddonGenerator.start);
-                newThread.Start(this);
+
+                if (currentMode.Equals(Mode.addon))
+                {
+                    Thread newThread = new Thread(AddonGenerator.start);
+                    newThread.Start(this);
+                }
+                else if (currentMode.Equals(Mode.replace))
+                {
+                    Thread newThread = new Thread(ReplaceGenerator.Start);
+                    newThread.Start(this);
+                }
+                else if (currentMode.Equals(Mode.modkit))
+                {
+                    Thread newThread = new Thread(ModkitFixer.Start);
+                    newThread.Start(this);
+                }
             }
             else
             {
@@ -139,65 +145,168 @@ namespace ResourceCreatorv2
                 nametxb.Enabled = false;
                 convertbtn.Enabled = false;
             }
+
             convertbtn.Text = "Converting..";
         }
 
         private void fileTicker_Tick(object sender, EventArgs e)
         {
-            if (addongroup.Visible)
+            if (!currentMode.Equals(Mode.modkit))
             {
                 fileslist.Items.Clear();
 
-                Utils.ProcessDirectory("./input", (file, obj) =>
+                if (currentMode.Equals(Mode.addon))
                 {
-                    if (file.EndsWith(".rpf"))
-                    {
-                        ((ListBox)obj).Items.Add(file.Replace("./input\\", ""));
-                    }
-                }, fileslist);
-            }
-            else
-            {
-                filesreplace.Items.Clear();
 
-                Utils.ProcessDirectory("./input", (file, obj) =>
-                {
-                    if (file.EndsWith(".ytd") || file.EndsWith(".yft"))
+
+                    Utils.ProcessDirectory("./input", (file, obj) =>
                     {
-                        ((ListBox)obj).Items.Add(file.Replace("./input\\", ""));
-                    }
-                }, filesreplace);
+                        if (file.EndsWith(".rpf"))
+                        {
+                            ((ListBox)obj).Items.Add(file.Replace("./input\\", ""));
+                        }
+                    }, fileslist);
+                }
+                else if (currentMode.Equals(Mode.replace))
+                {
+                    Utils.ProcessDirectory("./input", (file, obj) =>
+                    {
+                        if (file.EndsWith(".ytd") || file.EndsWith(".yft"))
+                        {
+                            ((ListBox)obj).Items.Add(file.Replace("./input\\", ""));
+                        }
+                    }, fileslist);
+                }
             }
         }
 
         private void addonbtn_Click(object sender, EventArgs e)
         {
-            replacegroup.Visible = false;
-            addongroup.Visible = true;
+            if (!converting)
+            {
+                currentMode = Mode.addon;
+                addongroup.Text = "Addon Vehicles";
+            }
         }
 
         private void replacebtn_Click(object sender, EventArgs e)
         {
-            addongroup.Visible = false;
-            replacegroup.Visible = true;
+            if (!converting)
+            {
+                currentMode = Mode.replace;
+                addongroup.Text = "Replace Vehicles";
+            }
         }
 
-        private void replaceStartbtn_Click(object sender, EventArgs e)
+        private void enginebtn_Click(object sender, EventArgs e)
         {
-            if (!converting2)
+            if (!converting)
             {
-                converting2 = true;
-                replaceErrorMsg.Visible = false;
-                Thread newThread = new Thread(ReplaceGenerator.Start);
-                newThread.Start(this);
+                currentMode = Mode.audio;
+                addongroup.Text = "Engine Audio";
             }
-            else
+        }
+
+        private void browseBtn_Click(object sender, EventArgs e)
+        {
+            if (converting)
+                return;
+
+            using (var fbd = new FolderBrowserDialog())
             {
-                input = replacetxb.Text;
-                replacetxb.Enabled = false;
-                replaceStartbtn.Enabled = false;
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    rootDirtxb.Text = fbd.SelectedPath;
+                }
             }
-            replaceStartbtn.Text = "Converting..";
+        }
+
+
+        void populateModKits(dupInfo dups)
+        {
+            foreach (KeyValuePair<string, List<string>> entry in dups.dupIds)
+            {
+                if (entry.Value.Count > 1)
+                {
+                    string duplicate = "";
+
+                    foreach (string item in entry.Value)
+                    {
+                        string[] split = item.Split('\\');
+                        string modelName = split[split.Length - 2];
+                        duplicate += modelName + "|";
+                    }
+
+                    duplicate = duplicate.Remove(duplicate.Length - 1, 1); // remove trailing |
+
+                    fileslist.Items.Add(duplicate + $"({entry.Key})");
+
+                    Console.WriteLine(duplicate + $"({entry.Key})");
+                }
+            }
+        }
+
+        private void modkitbtn_Click(object sender, EventArgs e)
+        {
+            if (!converting)
+            {
+                currentMode = Mode.modkit;
+                addongroup.Text = "Modkit Fixer";
+
+                Thread t = new Thread(() =>
+                {
+                    fileslist.Invoke(new MethodInvoker(delegate
+                    {
+                        fileslist.Items.Clear();
+
+                        if (rootDirtxb.Text.Length > 1)
+                        {
+                            dupInfo dups = Misc.checkRootForDuplicateModKit(rootDirtxb.Text);
+
+                            populateModKits(dups);
+                        }
+                        else
+                        {
+                            errorMsg("Please set root dir!");
+                        }
+                    }));
+                });
+                t.Start();
+            }
+        }
+
+        private void rootDirtxb_TextChanged(object sender, EventArgs e)
+        {
+            if (currentMode == Mode.modkit)
+            {
+                Thread t = new Thread(() =>
+                {
+                    fileslist.Invoke(new MethodInvoker(delegate
+                    {
+                        fileslist.Items.Clear();
+
+                        if (rootDirtxb.Text.Length > 1)
+                        {
+                            dupInfo dups = Misc.checkRootForDuplicateModKit(rootDirtxb.Text);
+
+                            populateModKits(dups);
+                        }
+                        else
+                        {
+                            errorMsg("Please set root dir!");
+                        }
+                    }));
+                });
+                t.Start();
+            }
+
+            using (StreamWriter sw = new StreamWriter("config.xml"))
+            {
+                XmlSerializer ser = new XmlSerializer(typeof(string));
+                ser.Serialize(sw, rootDirtxb.Text);
+            }
         }
     }
 }
