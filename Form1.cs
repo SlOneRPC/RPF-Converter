@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.IO;
 using static ResourceCreatorv2.Misc;
@@ -20,7 +13,8 @@ namespace ResourceCreatorv2
         addon,
         replace,
         audio,
-        modkit
+        modkit,
+        resizer
     }
     public partial class ResourceCreator : Form
     {
@@ -39,17 +33,17 @@ namespace ResourceCreatorv2
             fileTicker.Interval = 1000;
             fileTicker.Start();
 
-            if (File.Exists("config.xml"))
-            {
-                string rootDir = "";
-                XmlSerializer ser = new XmlSerializer(typeof(string));
-                using (FileStream fs = File.OpenRead("config.xml"))
-                {
-                    rootDir = (string)ser.Deserialize(fs);
-                }
+            //if (File.Exists("config.xml"))
+            //{
+            //    string rootDir = "";
+            //    XmlSerializer ser = new XmlSerializer(typeof(string));
+            //    using (FileStream fs = File.OpenRead("config.xml"))
+            //    {
+            //        rootDir = (string)ser.Deserialize(fs);
+            //    }
 
-                rootDirtxb.Text = rootDir;
-            }
+            //    rootDirtxb.Text = rootDir;
+            //}
         }
 
         public string getRootDir()
@@ -74,6 +68,9 @@ namespace ResourceCreatorv2
 
                 convertbtn.Enabled = true;
                 convertbtn.Text = "Next";
+
+                logpanel.Visible = false;
+                inputpanel.Visible = true;
             }));
             
             input = null;
@@ -81,6 +78,12 @@ namespace ResourceCreatorv2
             {
                 Thread.Sleep(100);
             }
+
+            namelbl.Invoke(new MethodInvoker(delegate
+            {
+                logpanel.Visible = true;
+                inputpanel.Visible = false;
+            }));
 
             return input;
         }
@@ -95,8 +98,8 @@ namespace ResourceCreatorv2
                 nametxb.Enabled = false;
                 nametxb.Text = "";
 
-                convertbtn.Enabled = true;
-                convertbtn.Text = "Start Converting";
+                startbtn.Enabled = true;
+                startbtn.Text = "Start Converting";
 
                 if (currentMode.Equals(Mode.modkit) && rootDirtxb.Text.Length > 1)
                 {
@@ -116,30 +119,25 @@ namespace ResourceCreatorv2
             }));
         }
 
+        public void LogMessage(string message, params object[] args)
+        {
+            LogMessage(string.Format(message, args));
+        }
+
+        public void LogMessage(string message)
+        {
+            logtxtbx.Invoke(new MethodInvoker(delegate
+            {
+                logtxtbx.AppendText(message);
+                logtxtbx.AppendText(Environment.NewLine);
+            }));
+
+            Console.WriteLine(message);
+        }
+
         private void convertbtn_Click(object sender, EventArgs e)
         {
-            if (!converting)
-            {
-                converting = true;
-                errorlbl.Visible = false;
-
-                if (currentMode.Equals(Mode.addon))
-                {
-                    Thread newThread = new Thread(AddonGenerator.start);
-                    newThread.Start(this);
-                }
-                else if (currentMode.Equals(Mode.replace))
-                {
-                    Thread newThread = new Thread(ReplaceGenerator.Start);
-                    newThread.Start(this);
-                }
-                else if (currentMode.Equals(Mode.modkit))
-                {
-                    Thread newThread = new Thread(ModkitFixer.Start);
-                    newThread.Start(this);
-                }
-            }
-            else
+            if (converting)
             {
                 input = nametxb.Text;
                 nametxb.Enabled = false;
@@ -151,32 +149,37 @@ namespace ResourceCreatorv2
 
         private void fileTicker_Tick(object sender, EventArgs e)
         {
-            if (!currentMode.Equals(Mode.modkit))
+            List<string> fileToPreview = new List<string>();
+
+            switch (currentMode)
+            {
+                case Mode.addon:
+                    fileToPreview.Add(".rpf");
+                    break;
+                case Mode.replace:
+                    fileToPreview.Add(".yft");
+                    goto case Mode.resizer;
+                case Mode.resizer:
+                    fileToPreview.Add(".ytd");
+                    break;
+                default:
+                    break;
+            }
+
+            if (fileToPreview.Count > 0)
             {
                 fileslist.Items.Clear();
 
-                if (currentMode.Equals(Mode.addon))
+                Utils.ProcessDirectory("./input", (file, obj) =>
                 {
-
-
-                    Utils.ProcessDirectory("./input", (file, obj) =>
+                    foreach (string preview in fileToPreview)
                     {
-                        if (file.EndsWith(".rpf"))
+                        if (file.EndsWith(preview))
                         {
                             ((ListBox)obj).Items.Add(file.Replace("./input\\", ""));
                         }
-                    }, fileslist);
-                }
-                else if (currentMode.Equals(Mode.replace))
-                {
-                    Utils.ProcessDirectory("./input", (file, obj) =>
-                    {
-                        if (file.EndsWith(".ytd") || file.EndsWith(".yft"))
-                        {
-                            ((ListBox)obj).Items.Add(file.Replace("./input\\", ""));
-                        }
-                    }, fileslist);
-                }
+                    }
+                }, fileslist);
             }
         }
 
@@ -204,6 +207,15 @@ namespace ResourceCreatorv2
             {
                 currentMode = Mode.audio;
                 addongroup.Text = "Engine Audio";
+            }
+        }
+
+        private void resizerbtn_Click(object sender, EventArgs e)
+        {
+            if (!converting)
+            {
+                currentMode = Mode.resizer;
+                addongroup.Text = resizerbtn.Text;
             }
         }
 
@@ -243,7 +255,7 @@ namespace ResourceCreatorv2
 
                     fileslist.Items.Add(duplicate + $"({entry.Key})");
 
-                    Console.WriteLine(duplicate + $"({entry.Key})");
+                    LogMessage(duplicate + $"({entry.Key})");
                 }
             }
         }
@@ -306,6 +318,33 @@ namespace ResourceCreatorv2
             {
                 XmlSerializer ser = new XmlSerializer(typeof(string));
                 ser.Serialize(sw, rootDirtxb.Text);
+            }
+        }
+
+        private void startbtn_Click(object sender, EventArgs e)
+        {
+            if (!converting)
+            {
+                converting = true;
+                errorlbl.Visible = false;
+                logtxtbx.Clear();
+
+                startbtn.Text = "Converting..";
+                startbtn.Enabled = false;
+
+                Thread newThread;
+
+                if (currentMode.Equals(Mode.addon))
+                    newThread = new Thread(AddonGenerator.start);
+                else if (currentMode.Equals(Mode.replace))
+                    newThread = new Thread(ReplaceGenerator.Start);
+                else if (currentMode.Equals(Mode.modkit))
+                    newThread = new Thread(ModkitFixer.Start);
+                else if (currentMode.Equals(Mode.resizer))
+                    newThread = new Thread(TextureResizer.Start);
+                else return;
+
+                newThread.Start(this);
             }
         }
     }
