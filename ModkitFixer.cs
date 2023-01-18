@@ -60,10 +60,10 @@ namespace ResourceCreatorv2
                     }
                     else
                     {
-                        Console.WriteLine("Can't find carvariations !!");
+                        convertForm.LogMessage("Can't find carvariations !!");
                     }
 
-                    Console.WriteLine("Updated -> " + pathSplit[pathSplit.Length - 2]);
+                    convertForm.LogMessage("Updated -> " + pathSplit[pathSplit.Length - 2]);
                     currentID = i + 12;
 
                     return;

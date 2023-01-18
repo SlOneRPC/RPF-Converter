@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.IO.Compression;
 using CodeWalker.GameFiles;
 using CodeWalker.Utils;
+using System.Windows.Forms;
+
 namespace ResourceCreatorv2
 {
     public class ReplaceGenerator
@@ -84,13 +86,13 @@ namespace ResourceCreatorv2
 
                             if (fileName.EndsWith(".ytd"))
                             {
-                                ytdResize(fileName);
+                                Utils.YtdResize(fileName);
                             }
 
                             File.Move(fileName, destination.Replace(oldModelName, modelName));
 
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Moved file '{0}' -> {1}.", fileName, destination);
+                            convertForm.LogMessage("Moved file '{0}' -> {1}.", fileName, destination);
                             Console.ForegroundColor = ConsoleColor.White;
 
                             break;
@@ -101,7 +103,7 @@ namespace ResourceCreatorv2
                 if (File.Exists(fileName))
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("Found non useful file '{0}'.", fileName);
+                    convertForm.LogMessage("Found non useful file '{0}'.", fileName);
                     Console.ForegroundColor = ConsoleColor.White;
                     File.Delete(fileName);
                 }
@@ -110,13 +112,8 @@ namespace ResourceCreatorv2
             // Handle meta files
             if (!Directory.Exists("./replace-files"))
             {
-                Directory.CreateDirectory("./replace-files");
-                WebClient cln = new WebClient();
-                cln.DownloadFile("https://drive.google.com/uc?export=download&id=1WcgA0JtS244QpDqi4dO0hIx69zEnLmlB", "replace-files.zip");
-
-                ZipFile.ExtractToDirectory("replace-files.zip", "./replace-files");
-
-                File.Delete("replace-files.zip");
+                MessageBox.Show("You are missing essential replace files located in the 'replace-files' directory, please redownload the app!");
+                return;
             }
 
             if (!Directory.Exists("./resource\\meta"))
@@ -158,33 +155,7 @@ namespace ResourceCreatorv2
                 File.WriteAllLines($"./resource\\meta\\{modelName}\\{fileSplit[fileSplit.Length - 1]}", lines);
 
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Moved file '{0}' -> {1}.", fileName, $"./resource\\meta\\{modelName}\\{fileSplit[fileSplit.Length - 1]}");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-        }
-
-        public static void ytdResize(string file)
-        {
-            try
-            {
-                byte[] fileData = File.ReadAllBytes(file);
-                string[] subPath = file.Split('\\');
-
-                RpfFileEntry entry = Utils.CreateFileEntry(subPath[subPath.Length - 1], file, ref fileData);
-                    
-                YtdFile ytd = new YtdFile();
-                ytd.Load(fileData, entry);
-
-                byte[] reizedYTD = Utils.DoResizing(ytd, fileData.Length > 5242880);
-                if (reizedYTD != null)
-                {
-                    File.WriteAllBytes(file, reizedYTD);
-                }
-            }
-            catch (Exception)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"There was a problem resizing -> {file}");
+                convertForm.LogMessage("Moved file '{0}' -> {1}.", fileName, $"./resource\\meta\\{modelName}\\{fileSplit[fileSplit.Length - 1]}");
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }
@@ -193,8 +164,8 @@ namespace ResourceCreatorv2
         {
             convertForm = (ResourceCreator)form;
 
-            Console.WriteLine("Welcome to resource creator!");
-            Console.WriteLine("Checking resource...");
+            convertForm.LogMessage("Welcome to resource creator!");
+            convertForm.LogMessage("Checking resource...");
 
             // Check directories
             if (!Directory.Exists("./input"))
@@ -202,21 +173,7 @@ namespace ResourceCreatorv2
                 Directory.CreateDirectory("./input");
             }
 
-            //if (Directory.Exists("./resource"))
-            //{
-            //    Directory.Delete("./resource", true);
-            //}
-
-            if (Directory.Exists("./rpf-extracted"))
-            {
-                Directory.Delete("./rpf-extracted", true);
-
-                Directory.CreateDirectory("./rpf-extracted");
-            }
-            else
-            {
-                Directory.CreateDirectory("./rpf-extracted");
-            }
+            Utils.ClearDirectory("./rpf-extracted");
 
             Utils.ProcessDirectory("./input", (file, move) =>
             {
@@ -233,7 +190,7 @@ namespace ResourceCreatorv2
             }
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("congrats you made it!");
+            convertForm.LogMessage("congrats you made it!");
             Console.ForegroundColor = ConsoleColor.White;
 
             convertForm.convertComplete();

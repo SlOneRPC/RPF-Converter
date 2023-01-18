@@ -108,7 +108,7 @@ namespace ResourceCreatorv2
                             File.Move(path, $"./resource\\{extentionMap.Key}\\{latestModelName}\\{file}");
 
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Moved file '{0}' -> {1}.", path, $"./resource/{extentionMap.Key}/{latestModelName}/{divided[divided.Length - 1]}");
+                            convertForm.LogMessage("Moved file '{0}' -> {1}.", path, $"./resource/{extentionMap.Key}/{latestModelName}/{divided[divided.Length - 1]}");
                             Console.ForegroundColor = ConsoleColor.White;
 
                             return;
@@ -117,15 +117,15 @@ namespace ResourceCreatorv2
                 }
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Found non useful file '{0}'.", path);
+                convertForm.LogMessage("Found non useful file '{0}'.", path);
                 Console.ForegroundColor = ConsoleColor.White;
                 File.Delete(path);
             }
             catch(Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Failed to move file '{0}'.", path);
-                Console.WriteLine(e.Message);
+                convertForm.LogMessage("Failed to move file '{0}'.", path);
+                convertForm.LogMessage(e.Message);
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }
@@ -148,7 +148,7 @@ namespace ResourceCreatorv2
                 }
                 else
                 {
-                    Console.WriteLine("Input file is invalid ...");
+                    convertForm.LogMessage("Input file is invalid ...");
                 }
 
             }
@@ -172,20 +172,20 @@ namespace ResourceCreatorv2
                                 {
                                     if (binentry.FileSize == 0)
                                     {
-                                        Console.WriteLine("Invalid binary file size!");
+                                        convertForm.LogMessage("Invalid binary file size!");
                                     }
                                     else
                                     {
-                                        Console.WriteLine("data is null!");
+                                        convertForm.LogMessage("data is null!");
                                     }
                                 }
                                 else if (data.Length == 0)
                                 {
-                                    Console.WriteLine("{0} : Decompressed output was empty.", entry.Path);
+                                    convertForm.LogMessage("{0} : Decompressed output was empty.", entry.Path);
                                 }
                                 else
                                 {
-                                    Console.WriteLine("binary meme -> " + entry.NameLower);
+                                    convertForm.LogMessage("binary meme -> " + entry.NameLower);
                                     File.WriteAllBytes(directoryOffset + entry.NameLower, data);
                                 }
                             }
@@ -199,27 +199,27 @@ namespace ResourceCreatorv2
                                 {
                                     if (resentry.FileSize == 0)
                                     {
-                                        Console.WriteLine("{0} : Resource FileSize is 0.", entry.Path);
+                                        convertForm.LogMessage("{0} : Resource FileSize is 0.", entry.Path);
                                     }
                                     else
                                     {
-                                        Console.WriteLine("{0} : {1}", entry.Path);
+                                        convertForm.LogMessage("{0} : {1}", entry.Path);
                                     }
                                 }
                                 else if (data.Length == 0)
                                 {
-                                    Console.WriteLine("{0} : Decompressed output was empty.", entry.Path);
+                                    convertForm.LogMessage("{0} : Decompressed output was empty.", entry.Path);
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Potential meme -> " + entry.NameLower);
+                                    convertForm.LogMessage("Potential meme -> " + entry.NameLower);
                                     foreach (KeyValuePair<string, string[]> extentionMap in extensions)
                                     {
                                         foreach (string extention in extentionMap.Value)
                                         {
                                             if (entry.NameLower.EndsWith(extention))
                                             {
-                                                Console.WriteLine("Resource meme -> " + entry.NameLower);
+                                                convertForm.LogMessage("Resource meme -> " + entry.NameLower);
 
                                                 if (extention.Equals(".ytd"))
                                                 {
@@ -275,8 +275,8 @@ namespace ResourceCreatorv2
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception memes!");
-                Console.WriteLine(e.Message);
+                convertForm.LogMessage("Exception memes!");
+                convertForm.LogMessage(e.Message);
             }
         }
 
@@ -305,12 +305,13 @@ namespace ResourceCreatorv2
             }
             Directory.Delete(source, true);
         }
+
         public static void start(object form)
         {
             convertForm = (ResourceCreator)form;
 
-            Console.WriteLine("Welcome to resource creator!");
-            Console.WriteLine("Checking resource...");
+            convertForm.LogMessage("Welcome to resource creator!");
+            convertForm.LogMessage("Checking resource...");
 
             // Check directories
             if (!Directory.Exists("./input"))
@@ -318,23 +319,7 @@ namespace ResourceCreatorv2
                 Directory.CreateDirectory("./input");
             }
 
-          
-            //if (Directory.Exists("./resource"))
-            //{
-            //    Directory.Delete("./resource", true);
-            //}
-
-
-            if (Directory.Exists("./rpf-extracted"))
-            {
-                Directory.Delete("./rpf-extracted", true);
-
-                Directory.CreateDirectory("./rpf-extracted");
-            }
-            else
-            {
-                Directory.CreateDirectory("./rpf-extracted");
-            }
+            Utils.ClearDirectory("./rpf-extracted");
 
             Utils.ProcessDirectory("./input", (file, move) =>
             {
@@ -355,7 +340,7 @@ namespace ResourceCreatorv2
             }
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("congrats you made it!");
+            convertForm.LogMessage("congrats you made it!");
             Console.ForegroundColor = ConsoleColor.White;
 
             convertForm.convertComplete();

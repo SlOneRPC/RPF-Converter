@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ResourceCreatorv2
 {
-    public class Misc
+    public static class Misc
     {
         public static bool checkRootForModelName(string modelName, string rootPath)
         {

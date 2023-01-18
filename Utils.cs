@@ -26,6 +26,20 @@ namespace ResourceCreatorv2
                 ProcessDirectory(subdirectory, FileHandler, flags);
         }
 
+        public static void ClearDirectory(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+
+                Directory.CreateDirectory(path);
+            }
+            else
+            {
+                Directory.CreateDirectory(path);
+            }
+        }
+
         public static RpfFileEntry CreateFileEntry(string name, string path, ref byte[] data)
         {
             //this should only really be used when loading a file from the filesystem.
@@ -54,6 +68,32 @@ namespace ResourceCreatorv2
         private static double ConvertBytesToMegabytes(long bytes)
         {
             return (bytes / 1024f) / 1024f;
+        }
+
+        public static void YtdResize(string path)
+        {
+            try
+            {
+                byte[] fileData = File.ReadAllBytes(path);
+                string[] subPath = path.Split('\\');
+
+                RpfFileEntry entry = Utils.CreateFileEntry(subPath[subPath.Length - 1], path, ref fileData);
+
+                YtdFile ytd = new YtdFile();
+                ytd.Load(fileData, entry);
+
+                byte[] reizedYTD = DoResizing(ytd, fileData.Length > 5242880);
+                if (reizedYTD != null)
+                {
+                    File.WriteAllBytes(path, reizedYTD);
+                }
+            }
+            catch (Exception)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"There was a problem resizing -> {path}");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
         }
 
         public static byte[] DoResizing(YtdFile ytd, bool needsForcedResized)
