@@ -24,7 +24,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <AutorunEnabled>true</AutorunEnabled>
-    <ApplicationRevision>8</ApplicationRevision>
+    <ApplicationRevision>16</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -186,6 +186,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplaceGenerator.cs" />
+    <Compile Include="ResizeUtils.cs" />
     <Compile Include="TextureResizer.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Utils\BoundingBoxes.cs" />
@@ -239,7 +240,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="ResourceCreatorv2_TemporaryKey.pfx" />
     <None Include="Resources\magic.dat" />
   </ItemGroup>
   <ItemGroup>

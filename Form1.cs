@@ -23,6 +23,8 @@ namespace ResourceCreatorv2
 
         static Mode currentMode = Mode.addon;
 
+        public ResizeUtils resizer { get; set; }
+
         public ResourceCreator()
         {
             InitializeComponent();
@@ -54,6 +56,26 @@ namespace ResourceCreatorv2
                 text = rootDirtxb.Text;
             }));
             return text;
+        }
+
+        public float getMinFileResize()
+        {
+            decimal val = 0;
+            rootDirtxb.Invoke(new MethodInvoker(delegate
+            {
+                val = minFileResizeSel.Value;
+            }));
+            return (float)val;
+        }
+
+        public float getMinAcceptableTextureMem()
+        {
+            decimal val = 0;
+            rootDirtxb.Invoke(new MethodInvoker(delegate
+            {
+                val = minAcceptableTextureMem.Value;
+            }));
+            return (float)val;
         }
 
         public string requestInput(string msg, string defaultValue = "")
@@ -161,6 +183,7 @@ namespace ResourceCreatorv2
                     goto case Mode.resizer;
                 case Mode.resizer:
                     fileToPreview.Add(".ytd");
+                    fileToPreview.Add(".ydr");
                     break;
                 default:
                     break;
@@ -328,6 +351,8 @@ namespace ResourceCreatorv2
                 converting = true;
                 errorlbl.Visible = false;
                 logtxtbx.Clear();
+
+                resizer = new ResizeUtils(getMinFileResize(), getMinAcceptableTextureMem());
 
                 startbtn.Text = "Converting..";
                 startbtn.Enabled = false;

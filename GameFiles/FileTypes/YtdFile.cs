@@ -44,7 +44,6 @@ namespace CodeWalker.GameFiles
             //{
             //    MemoryUsage += TextureDict.MemoryUsage;
             //}
-
         }
 
 

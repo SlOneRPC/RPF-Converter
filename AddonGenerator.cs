@@ -221,23 +221,12 @@ namespace ResourceCreatorv2
                                             {
                                                 convertForm.LogMessage("Resource meme -> " + entry.NameLower);
 
-                                                if (extention.Equals(".ytd"))
+                                                if (extention.Equals(".ytd") || extention.Equals(".ydr"))
                                                 {
                                                     RpfFileEntry rpfent = entry as RpfFileEntry;
 
-                                                    byte[] ytddata = rpfent.File.ExtractFile(rpfent);
-
-                                                    bool needsResized = ytddata.Length > 5242880; // 5MB
-
-                                                    YtdFile ytd = new YtdFile();
-                                                    ytd.Load(ytddata, rpfent);
-
-                                                    byte[] resizedData = Utils.DoResizing(ytd, needsResized);
-                                                    if (resizedData != null)
-                                                    {
-                                                        File.WriteAllBytes(directoryOffset + entry.NameLower, resizedData);
+                                                    if (convertForm.resizer.ResizeFile(directoryOffset + entry.NameLower, rpfent))
                                                         break;
-                                                    }
                                                 }
 
                                                 File.WriteAllBytes(directoryOffset + entry.NameLower, data);

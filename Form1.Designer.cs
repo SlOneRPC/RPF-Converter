@@ -37,9 +37,6 @@
             this.startbtn = new System.Windows.Forms.Button();
             this.fileslist = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.logpanel = new System.Windows.Forms.Panel();
-            this.label5 = new System.Windows.Forms.Label();
-            this.logtxtbx = new System.Windows.Forms.TextBox();
             this.inputpanel = new System.Windows.Forms.Panel();
             this.convertbtn = new System.Windows.Forms.Button();
             this.browseBtn = new System.Windows.Forms.Button();
@@ -48,14 +45,25 @@
             this.rootDirtxb = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.nametxb = new System.Windows.Forms.TextBox();
+            this.logpanel = new System.Windows.Forms.Panel();
+            this.label5 = new System.Windows.Forms.Label();
+            this.logtxtbx = new System.Windows.Forms.TextBox();
             this.fileTicker = new System.Windows.Forms.Timer(this.components);
             this.enginebtn = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.modkitbtn = new System.Windows.Forms.Button();
             this.resizerbtn = new System.Windows.Forms.Button();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.minAcceptableTextureMem = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
+            this.minFileResizeSel = new System.Windows.Forms.NumericUpDown();
             this.addongroup.SuspendLayout();
-            this.logpanel.SuspendLayout();
             this.inputpanel.SuspendLayout();
+            this.logpanel.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.minAcceptableTextureMem)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.minFileResizeSel)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -125,12 +133,11 @@
             // 
             // fileslist
             // 
-            this.fileslist.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fileslist.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fileslist.FormattingEnabled = true;
-            this.fileslist.ItemHeight = 21;
             this.fileslist.Location = new System.Drawing.Point(6, 42);
             this.fileslist.Name = "fileslist";
-            this.fileslist.Size = new System.Drawing.Size(211, 151);
+            this.fileslist.Size = new System.Drawing.Size(211, 147);
             this.fileslist.TabIndex = 7;
             // 
             // label3
@@ -141,34 +148,6 @@
             this.label3.Size = new System.Drawing.Size(83, 13);
             this.label3.TabIndex = 1;
             this.label3.Text = "Files to Convert:";
-            // 
-            // logpanel
-            // 
-            this.logpanel.Controls.Add(this.label5);
-            this.logpanel.Controls.Add(this.logtxtbx);
-            this.logpanel.Location = new System.Drawing.Point(219, 14);
-            this.logpanel.Name = "logpanel";
-            this.logpanel.Size = new System.Drawing.Size(337, 236);
-            this.logpanel.TabIndex = 9;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(18, 8);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(45, 19);
-            this.label5.TabIndex = 10;
-            this.label5.Text = "Log:";
-            // 
-            // logtxtbx
-            // 
-            this.logtxtbx.Enabled = false;
-            this.logtxtbx.Location = new System.Drawing.Point(18, 27);
-            this.logtxtbx.Multiline = true;
-            this.logtxtbx.Name = "logtxtbx";
-            this.logtxtbx.Size = new System.Drawing.Size(301, 205);
-            this.logtxtbx.TabIndex = 6;
             // 
             // inputpanel
             // 
@@ -265,6 +244,34 @@
             this.nametxb.Size = new System.Drawing.Size(298, 29);
             this.nametxb.TabIndex = 2;
             // 
+            // logpanel
+            // 
+            this.logpanel.Controls.Add(this.label5);
+            this.logpanel.Controls.Add(this.logtxtbx);
+            this.logpanel.Location = new System.Drawing.Point(219, 14);
+            this.logpanel.Name = "logpanel";
+            this.logpanel.Size = new System.Drawing.Size(337, 236);
+            this.logpanel.TabIndex = 9;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(18, 8);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(45, 19);
+            this.label5.TabIndex = 10;
+            this.label5.Text = "Log:";
+            // 
+            // logtxtbx
+            // 
+            this.logtxtbx.Enabled = false;
+            this.logtxtbx.Location = new System.Drawing.Point(18, 27);
+            this.logtxtbx.Multiline = true;
+            this.logtxtbx.Name = "logtxtbx";
+            this.logtxtbx.Size = new System.Drawing.Size(301, 205);
+            this.logtxtbx.TabIndex = 6;
+            // 
             // fileTicker
             // 
             this.fileTicker.Interval = 500;
@@ -302,11 +309,79 @@
             this.resizerbtn.UseVisualStyleBackColor = true;
             this.resizerbtn.Click += new System.EventHandler(this.resizerbtn_Click);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label7);
+            this.groupBox1.Controls.Add(this.minAcceptableTextureMem);
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.minFileResizeSel);
+            this.groupBox1.Location = new System.Drawing.Point(12, 379);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(557, 68);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Resizing Settings";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(216, 20);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(248, 13);
+            this.label7.TabIndex = 3;
+            this.label7.Text = "Min acceptable texture (image) memory usage (MB)";
+            // 
+            // minAcceptableTextureMem
+            // 
+            this.minAcceptableTextureMem.DecimalPlaces = 1;
+            this.minAcceptableTextureMem.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.minAcceptableTextureMem.Location = new System.Drawing.Point(219, 39);
+            this.minAcceptableTextureMem.Name = "minAcceptableTextureMem";
+            this.minAcceptableTextureMem.Size = new System.Drawing.Size(114, 20);
+            this.minAcceptableTextureMem.TabIndex = 2;
+            this.minAcceptableTextureMem.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(10, 20);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(200, 13);
+            this.label6.TabIndex = 1;
+            this.label6.Text = "Min uncompressed file size to resize (MB)";
+            // 
+            // minFileResizeSel
+            // 
+            this.minFileResizeSel.DecimalPlaces = 1;
+            this.minFileResizeSel.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+            this.minFileResizeSel.Location = new System.Drawing.Point(10, 39);
+            this.minFileResizeSel.Name = "minFileResizeSel";
+            this.minFileResizeSel.Size = new System.Drawing.Size(114, 20);
+            this.minFileResizeSel.TabIndex = 0;
+            this.minFileResizeSel.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            // 
             // ResourceCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(577, 384);
+            this.ClientSize = new System.Drawing.Size(577, 450);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.resizerbtn);
             this.Controls.Add(this.modkitbtn);
             this.Controls.Add(this.enginebtn);
@@ -321,10 +396,14 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.addongroup.ResumeLayout(false);
             this.addongroup.PerformLayout();
-            this.logpanel.ResumeLayout(false);
-            this.logpanel.PerformLayout();
             this.inputpanel.ResumeLayout(false);
             this.inputpanel.PerformLayout();
+            this.logpanel.ResumeLayout(false);
+            this.logpanel.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.minAcceptableTextureMem)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.minFileResizeSel)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -356,6 +435,11 @@
         private System.Windows.Forms.Panel logpanel;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox logtxtbx;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.NumericUpDown minAcceptableTextureMem;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.NumericUpDown minFileResizeSel;
+        private System.Windows.Forms.Label label7;
     }
 }
 

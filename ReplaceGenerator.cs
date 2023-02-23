@@ -84,9 +84,9 @@ namespace ResourceCreatorv2
 
                             string destination = $"./resource\\{extentionMap.Key}\\{modelName}\\{fileName.Split('\\')[fileName.Split('\\').Length - 1]}";
 
-                            if (fileName.EndsWith(".ytd"))
+                            if (fileName.EndsWith(".ytd") || fileName.EndsWith(".ydr"))
                             {
-                                Utils.YtdResize(fileName);
+                                convertForm.resizer.ResizeFile(fileName);
                             }
 
                             File.Move(fileName, destination.Replace(oldModelName, modelName));

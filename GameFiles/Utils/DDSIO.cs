@@ -514,6 +514,7 @@ namespace CodeWalker.Utils
                 case TextureFormat.D3DFMT_A8B8G8R8: format = DXGI_FORMAT.DXGI_FORMAT_R8G8B8A8_UNORM; break;
                 case TextureFormat.D3DFMT_L8: format = DXGI_FORMAT.DXGI_FORMAT_R8_UNORM; break;
                 case TextureFormat.D3DFMT_A8R8G8B8: format = DXGI_FORMAT.DXGI_FORMAT_B8G8R8A8_UNORM; break;
+                case TextureFormat.D3DFMT_X8R8G8B8: format = DXGI_FORMAT.DXGI_FORMAT_B8G8R8X8_UNORM; break;
             }
             return format;
         }

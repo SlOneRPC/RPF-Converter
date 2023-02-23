@@ -12,4 +12,4 @@ Features include:
 To use this:
 - **Addon Vehicles** - provide a folder called input containing .rpf's and run the exe.
 - **Replace Vehicles** - provide folders within input containing replacement models, meta files will be generated from running the tool
-- **Texture Resizer** - provide a folder called input containing .ytd files to be resized.
+- **Texture Resizer** - provide a folder called input containing .ytd or .ydr files to be resized.

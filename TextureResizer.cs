@@ -14,15 +14,10 @@ namespace ResourceCreatorv2
 
         private static void ProcessFileMove(string path)
         {
-            if (!path.EndsWith(".ytd"))
+            if (!path.EndsWith(".ytd") && !path.EndsWith(".ydr"))
                 return;
 
-            byte[] data = File.ReadAllBytes(path);
-
-            if (data.Length > 5242880)
-            {
-                Utils.YtdResize(path);
-            }
+            convertForm.resizer.ResizeFile(path);
 
             string[] splitPath = path.Split('\\');
 
