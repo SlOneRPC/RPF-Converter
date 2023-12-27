@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
 using System.Threading;
 using CodeWalker.GameFiles;
@@ -26,107 +27,127 @@ namespace ResourceCreatorv2
         // Model name replacement stuff
         private static bool requiresModelRename = false;
         private static string oldModelName = "";
-        private static string[] metasToReplace = new string[] { "vehicles.meta", "handling.meta", "carvariations.meta", "carcols.meta" };
+        private static string[] metasToReplace = new string[] 
+        { 
+            "vehicles.meta", "handling.meta", "carvariations.meta", "carcols.meta" 
+        };
+
+        static string CheckForModelRename()
+        {
+            while (true)
+            {
+                string updatedName = convertForm.requestInput($"Change model or press next:", latestModelName);
+
+                if (!Directory.Exists($"./resource\\meta\\{updatedName}"))
+                {
+                    if (convertForm.getRootDir().Length < 1 || !Misc.checkRootForModelName(updatedName, convertForm.getRootDir()))
+                        return updatedName;
+                    else
+                        convertForm.errorMsg("This model name is already in use in root dir!");
+                }
+                else
+                {
+                    convertForm.errorMsg("This model has already been converted!");
+                }
+            }
+        }
+
+        static string ProcessModelRename(string file, string path)
+        {
+            if (requiresModelRename)
+            {
+                if (file.Contains(oldModelName))
+                {
+                    return file.Replace(oldModelName, latestModelName);
+                }
+                else if (metasToReplace.Contains(file))
+                {
+                    string[] lines = File.ReadAllLines(path);
+
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        string line = lines[i].ToLower();
+                        if (line.Contains(oldModelName))
+                        {
+                            lines[i] = Regex.Replace(lines[i], oldModelName, latestModelName, RegexOptions.IgnoreCase);
+                        }
+                    }
+
+                    File.WriteAllLines(path, lines);
+                }
+            }
+            return file;
+        }
 
         // Process files inside the subdirectories
         private static void ProcessMoveFile(string path)
         {
             try
             {
-                foreach(KeyValuePair<string, string[]> extentionMap in extensions)
+                PerformExtensionsIterations((type, extention) =>
                 {
-                    foreach(string extention in extentionMap.Value)
+                    if (path.EndsWith(extention))
                     {
-                        if (path.EndsWith(extention))
+                        string[] divided = path.Split('\\');
+                        string file = divided[divided.Length - 1];
+
+                        if (!modelNames.ContainsKey(latestModelName))
                         {
-                            string[] divided = path.Split('\\');
+                            string updatedName = CheckForModelRename();
 
-                            if (!modelNames.ContainsKey(latestModelName))
+                            requiresModelRename = false;
+
+                            if (updatedName != latestModelName)
                             {
-                                string updatedName = "";
-
-                                while (true)
-                                {
-                                    updatedName = convertForm.requestInput($"Change model or press next:", latestModelName);
-
-                                    if (!Directory.Exists($"./resource\\meta\\{updatedName}"))
-                                    {
-                                        if (convertForm.getRootDir().Length < 1 || !Misc.checkRootForModelName(updatedName, convertForm.getRootDir()))
-                                            break;
-                                        else
-                                            convertForm.errorMsg("This model name is already in use in root dir!");
-                                    }
-                                    else
-                                    {
-                                        convertForm.errorMsg("This model has already been converted!");
-                                    }
-                                }
-
-                                requiresModelRename = false;
-
-                                if (updatedName != latestModelName)
-                                {
-                                    requiresModelRename = true;
-                                    oldModelName = latestModelName.ToLower();
-                                    latestModelName = updatedName;
-                                }
-
-                                string vehicleName = convertForm.requestInput($"Input vehicle name for {latestModelName}:");
-                                modelNames.Add(latestModelName, vehicleName);
+                                requiresModelRename = true;
+                                oldModelName = latestModelName.ToLower();
+                                latestModelName = updatedName;
                             }
 
-                            if (!Directory.Exists($"./resource\\{extentionMap.Key}\\{latestModelName}"))
-                            {
-                                Directory.CreateDirectory($"./resource\\{extentionMap.Key}\\{latestModelName}");
-                            }
-
-                            string file = divided[divided.Length - 1];
-
-                            if (requiresModelRename)
-                            {
-                                if (file.Contains(oldModelName))
-                                {
-                                    file = file.Replace(oldModelName, latestModelName);
-                                }
-                                else if (metasToReplace.Contains(file))
-                                {
-                                    string[] lines = File.ReadAllLines(path);
-
-                                    for (int i = 0; i < lines.Length; i++)
-                                    {
-                                        string line = lines[i].ToLower();
-                                        if (line.Contains(oldModelName))
-                                        {
-                                            lines[i] = Regex.Replace(lines[i], oldModelName, latestModelName, RegexOptions.IgnoreCase);
-                                        }
-                                    }
-
-                                    File.WriteAllLines(path, lines);
-                                }
-                            }
-
-                            File.Move(path, $"./resource\\{extentionMap.Key}\\{latestModelName}\\{file}");
-
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            convertForm.LogMessage("Moved file '{0}' -> {1}.", path, $"./resource/{extentionMap.Key}/{latestModelName}/{divided[divided.Length - 1]}");
-                            Console.ForegroundColor = ConsoleColor.White;
-
-                            return;
+                            modelNames.Add(latestModelName, convertForm.requestInput($"Input vehicle name for {latestModelName}:"));
                         }
-                    }
-                }
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                convertForm.LogMessage("Found non useful file '{0}'.", path);
-                Console.ForegroundColor = ConsoleColor.White;
-                File.Delete(path);
+                        if (!Directory.Exists($"./resource\\{type}\\{latestModelName}"))
+                        {
+                            Directory.CreateDirectory($"./resource\\{type}\\{latestModelName}");
+                        }
+
+                        file = ProcessModelRename(file, path);
+
+                        File.Move(path, $"./resource\\{type}\\{latestModelName}\\{file}");
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        convertForm.LogMessage("Moved file '{0}' -> {1}.", path, $"./resource/{type}/{latestModelName}/{divided[divided.Length - 1]}");
+                        Console.ForegroundColor = ConsoleColor.White;
+
+                        return false;
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    convertForm.LogMessage("Found non useful file '{0}'.", path);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    File.Delete(path);
+                    return true;
+                });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 convertForm.LogMessage("Failed to move file '{0}'.", path);
                 convertForm.LogMessage(e.Message);
                 Console.ForegroundColor = ConsoleColor.White;
+            }
+        }
+
+        static void PerformExtensionsIterations(Func<string, string, bool> extentionHandler)
+        {
+            foreach (KeyValuePair<string, string[]> extentionMap in extensions)
+            {
+                foreach (string extention in extentionMap.Value)
+                {
+                    if (!extentionHandler(extentionMap.Key, extention))
+                        return;
+                }
             }
         }
 
@@ -143,7 +164,7 @@ namespace ResourceCreatorv2
                     // Move
                     Utils.ProcessDirectory("./rpf-extracted", (file, move) =>
                     {
-                          ProcessMoveFile(file);
+                        ProcessMoveFile(file);
                     });
                 }
                 else
@@ -154,7 +175,7 @@ namespace ResourceCreatorv2
             }
         }
 
-        private static void ExtractFilesInRPF(RpfFile rpf, string directoryOffset)
+        private static void ExtractFilesInRPF(RpfFile rpf, string directoryOffset, int extractLevel = 0)
         {
             try
             {
@@ -213,28 +234,29 @@ namespace ResourceCreatorv2
                                 else
                                 {
                                     convertForm.LogMessage("Potential meme -> " + entry.NameLower);
-                                    foreach (KeyValuePair<string, string[]> extentionMap in extensions)
+
+                                    PerformExtensionsIterations((type, extention) =>
                                     {
-                                        foreach (string extention in extentionMap.Value)
+                                        if (entry.NameLower.EndsWith(extention))
                                         {
-                                            if (entry.NameLower.EndsWith(extention))
+                                            convertForm.LogMessage("Resource meme -> " + entry.NameLower);
+
+                                            if (extention.Equals(".ytd") || extention.Equals(".ydr"))
                                             {
-                                                convertForm.LogMessage("Resource meme -> " + entry.NameLower);
+                                                RpfFileEntry rpfent = entry as RpfFileEntry;
 
-                                                if (extention.Equals(".ytd") || extention.Equals(".ydr"))
-                                                {
-                                                    RpfFileEntry rpfent = entry as RpfFileEntry;
-
-                                                    if (convertForm.resizer.ResizeFile(directoryOffset + entry.NameLower, rpfent))
-                                                        break;
-                                                }
-
-                                                File.WriteAllBytes(directoryOffset + entry.NameLower, data);
-                                                break;
+                                                if (convertForm.resizer.ResizeFile(directoryOffset + entry.NameLower, rpfent))
+                                                    return false;
                                             }
-                                        }
-                                    }
 
+                                            File.WriteAllBytes(directoryOffset + entry.NameLower, data);
+                                            return false;
+                                        }
+
+                                        return true;
+                                    });
+
+                                    // assume if file is ytd then this represents a new vehicle
                                     if (entry.NameLower.EndsWith(".ytd"))
                                     {
                                         latestModelName = entry.NameLower.Remove(entry.NameLower.Length - 4);
@@ -253,8 +275,20 @@ namespace ResourceCreatorv2
 
                             if (subRPF.ScanStructure(null, null))
                             {
+                                string newExtractDir = $"./rpf-extracted-{extractLevel++}";
+
+                                Directory.CreateDirectory(newExtractDir);
+
                                 //recursive memes
-                                ExtractFilesInRPF(subRPF, directoryOffset);
+                                ExtractFilesInRPF(subRPF, newExtractDir, extractLevel);
+
+                                // Move
+                                Utils.ProcessDirectory(newExtractDir, (file, move) =>
+                                {
+                                    ProcessMoveFile(file);
+                                });
+
+                                Directory.Delete(newExtractDir, true);
                             }
                             //yeet
                             File.Delete(directoryOffset + entry.NameLower);
@@ -267,32 +301,6 @@ namespace ResourceCreatorv2
                 convertForm.LogMessage("Exception memes!");
                 convertForm.LogMessage(e.Message);
             }
-        }
-
-        private static void MoveDirectory(string source, string target)
-        {
-            var sourcePath = source.TrimEnd('\\', ' ');
-            var targetPath = target.TrimEnd('\\', ' ');
-            var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories).GroupBy(s => Path.GetDirectoryName(s));
-            foreach (var folder in files)
-            {
-                var targetFolder = folder.Key.Replace(sourcePath, targetPath);
-                Directory.CreateDirectory(targetFolder);
-                foreach (var file in folder)
-                {
-                    try
-                    {
-                        var targetFile = Path.Combine(targetFolder, Path.GetFileName(file));
-                        if (File.Exists(targetFile)) File.Delete(targetFile);
-                        File.Move(file, targetFile);
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-                }
-            }
-            Directory.Delete(source, true);
         }
 
         public static void start(object form)
@@ -308,6 +316,7 @@ namespace ResourceCreatorv2
                 Directory.CreateDirectory("./input");
             }
 
+            // Remove existing resized assets
             Utils.ClearDirectory("./rpf-extracted");
 
             Utils.ProcessDirectory("./input", (file, move) =>
@@ -315,7 +324,8 @@ namespace ResourceCreatorv2
                 ProcessFile(file);
             });
 
-            MoveDirectory(".\\input", ".\\old-inputs");
+            // Create a copy of assets from last run
+            Utils.MoveDirectory(".\\input", ".\\old-inputs");
 
             Directory.CreateDirectory("./input");
 

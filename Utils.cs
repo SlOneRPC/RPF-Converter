@@ -70,6 +70,32 @@ namespace ResourceCreatorv2
             return (bytes / 1024f) / 1024f;
         }
 
+        public static void MoveDirectory(string source, string target)
+        {
+            var sourcePath = source.TrimEnd('\\', ' ');
+            var targetPath = target.TrimEnd('\\', ' ');
+            var files = Directory.EnumerateFiles(sourcePath, "*", SearchOption.AllDirectories).GroupBy(s => Path.GetDirectoryName(s));
+            foreach (var folder in files)
+            {
+                var targetFolder = folder.Key.Replace(sourcePath, targetPath);
+                Directory.CreateDirectory(targetFolder);
+                foreach (var file in folder)
+                {
+                    try
+                    {
+                        var targetFile = Path.Combine(targetFolder, Path.GetFileName(file));
+                        if (File.Exists(targetFile)) File.Delete(targetFile);
+                        File.Move(file, targetFile);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+            }
+            Directory.Delete(source, true);
+        }
+
         public static void WriteOutputFile(Dictionary<string, string> modelNames)
         {
             // Write memes to file
