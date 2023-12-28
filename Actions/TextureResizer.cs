@@ -23,19 +23,15 @@ namespace ResourceCreatorv2
 
             string destination = $"./output\\{splitPath[splitPath.Length - 1]}";
 
-            File.Move(path, destination);
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            convertForm.LogMessage("Moved file '{0}' -> {1}.", path, destination);
-            Console.ForegroundColor = ConsoleColor.White;
+            Utils.MoveFile(path, destination);
         }
 
         public static void Start(object form)
         {
             convertForm = (ResourceCreator)form;
 
-            convertForm.LogMessage("Welcome to resource creator!");
-            convertForm.LogMessage("Checking resource...");
+            Console.WriteLine("Welcome to resource creator!");
+            Console.WriteLine("Checking resource...");
 
             // Check directories
             if (!Directory.Exists("./input"))
@@ -53,7 +49,7 @@ namespace ResourceCreatorv2
             });
 
             Console.ForegroundColor = ConsoleColor.Green;
-            convertForm.LogMessage("congrats you made it!");
+            Console.WriteLine("congrats you made it!");
             Console.ForegroundColor = ConsoleColor.White;
 
             convertForm.convertComplete();

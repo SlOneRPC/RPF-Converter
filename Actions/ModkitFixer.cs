@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static ResourceCreatorv2.Misc;
-
+using static ResourceCreatorv2.Logger;
 namespace ResourceCreatorv2
 {
     public class ModkitFixer
@@ -60,10 +60,10 @@ namespace ResourceCreatorv2
                     }
                     else
                     {
-                        convertForm.LogMessage("Can't find carvariations !!");
+                        LogError("Can't find carvariations !!");
                     }
 
-                    convertForm.LogMessage("Updated -> " + pathSplit[pathSplit.Length - 2]);
+                    LogInfo("Updated -> " + pathSplit[pathSplit.Length - 2]);
                     currentID = i + 12;
 
                     return;

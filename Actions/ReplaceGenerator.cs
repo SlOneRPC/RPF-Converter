@@ -10,7 +10,7 @@ using System.IO.Compression;
 using CodeWalker.GameFiles;
 using CodeWalker.Utils;
 using System.Windows.Forms;
-
+using static ResourceCreatorv2.Logger;
 namespace ResourceCreatorv2
 {
     public class ReplaceGenerator
@@ -38,73 +38,66 @@ namespace ResourceCreatorv2
             string[] fileEntries = Directory.GetFiles(path.Replace(divided[divided.Length - 1], ""));
             foreach (string fileName in fileEntries)
             {
-                foreach (KeyValuePair<string, string[]> extentionMap in AddonGenerator.extensions)
+                AddonGenerator.PerformExtensionsIterations((type, extention) =>
                 {
-                    foreach (string extention in extentionMap.Value)
+                    if (fileName.EndsWith(extention))
                     {
-                        if (fileName.EndsWith(extention))
+                        if (!modelNames.ContainsKey(modelName))
                         {
-                            if (!modelNames.ContainsKey(modelName))
+                            while (true)
                             {
-                                while (true)
+                                modelName = convertForm.requestInput($"Input model name name for {oldModelName}:");
+
+                                if (!Directory.Exists($"./resource\\meta\\{modelName}"))
                                 {
-                                    modelName = convertForm.requestInput($"Input model name name for {oldModelName}:");
-                                   
-                                    if (!Directory.Exists($"./resource\\meta\\{modelName}"))
-                                    {
-                                        if (convertForm.getRootDir().Length < 1 || !Misc.checkRootForModelName(modelName, convertForm.getRootDir()))
-                                            break;
-                                        else
-                                            convertForm.errorMsg("This model name is already in use in root dir!");
-                                    }
+                                    if (convertForm.getRootDir().Length < 1 || !Misc.checkRootForModelName(modelName, convertForm.getRootDir()))
+                                        break;
                                     else
-                                    {
-                                        convertForm.errorMsg("This model has already been converted!");
-                                    }
+                                        convertForm.errorMsg("This model name is already in use in root dir!");
                                 }
-
-                                string vehicleName = convertForm.requestInput($"Input vehicle name for {modelName}:");
-                                modelNames.Add(modelName, vehicleName);
-
-                                if (Directory.Exists($"./resource\\meta\\{modelName}"))
+                                else
                                 {
-                                    Directory.Delete($"./resource\\meta\\{modelName}", true);
-                                }
-
-                                if (Directory.Exists($"./resource\\stream\\{modelName}"))
-                                {
-                                    Directory.Delete($"./resource\\stream\\{modelName}", true);
+                                    convertForm.errorMsg("This model has already been converted!");
                                 }
                             }
 
-                            if (!Directory.Exists($"./resource\\{extentionMap.Key}\\{modelName}"))
+                            string vehicleName = convertForm.requestInput($"Input vehicle name for {modelName}:");
+                            modelNames.Add(modelName, vehicleName);
+
+                            if (Directory.Exists($"./resource\\meta\\{modelName}"))
                             {
-                                Directory.CreateDirectory($"./resource\\{extentionMap.Key}\\{modelName}");
+                                Directory.Delete($"./resource\\meta\\{modelName}", true);
                             }
 
-                            string destination = $"./resource\\{extentionMap.Key}\\{modelName}\\{fileName.Split('\\')[fileName.Split('\\').Length - 1]}";
-
-                            if (fileName.EndsWith(".ytd") || fileName.EndsWith(".ydr"))
+                            if (Directory.Exists($"./resource\\stream\\{modelName}"))
                             {
-                                convertForm.resizer.ResizeFile(fileName);
+                                Directory.Delete($"./resource\\stream\\{modelName}", true);
                             }
-
-                            File.Move(fileName, destination.Replace(oldModelName, modelName));
-
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            convertForm.LogMessage("Moved file '{0}' -> {1}.", fileName, destination);
-                            Console.ForegroundColor = ConsoleColor.White;
-
-                            break;
                         }
+
+                        if (!Directory.Exists($"./resource\\{type}\\{modelName}"))
+                        {
+                            Directory.CreateDirectory($"./resource\\{type}\\{modelName}");
+                        }
+
+                        string destination = $"./resource\\{type}\\{modelName}\\{fileName.Split('\\')[fileName.Split('\\').Length - 1]}";
+
+                        if (fileName.EndsWith(".ytd") || fileName.EndsWith(".ydr"))
+                        {
+                            convertForm.resizer.ResizeFile(fileName);
+                        }
+
+                        Utils.MoveFile(fileName, destination.Replace(oldModelName, modelName));
+
+                        return false;
                     }
-                }
+                    return true;
+                });
+                
 
                 if (File.Exists(fileName))
                 {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    convertForm.LogMessage("Found non useful file '{0}'.", fileName);
-                    Console.ForegroundColor = ConsoleColor.White;
+                    LogWarning("Found non useful file '{0}'.", fileName);
                     File.Delete(fileName);
                 }
             }
@@ -155,7 +148,7 @@ namespace ResourceCreatorv2
                 File.WriteAllLines($"./resource\\meta\\{modelName}\\{fileSplit[fileSplit.Length - 1]}", lines);
 
                 Console.ForegroundColor = ConsoleColor.Green;
-                convertForm.LogMessage("Moved file '{0}' -> {1}.", fileName, $"./resource\\meta\\{modelName}\\{fileSplit[fileSplit.Length - 1]}");
+                Console.WriteLine("Moved file '{0}' -> {1}.", fileName, $"./resource\\meta\\{modelName}\\{fileSplit[fileSplit.Length - 1]}");
                 Console.ForegroundColor = ConsoleColor.White;
             }
         }
@@ -164,8 +157,8 @@ namespace ResourceCreatorv2
         {
             convertForm = (ResourceCreator)form;
 
-            convertForm.LogMessage("Welcome to resource creator!");
-            convertForm.LogMessage("Checking resource...");
+            LogInfo("Welcome to resource creator!");
+            LogInfo("Checking resource...");
 
             // Check directories
             if (!Directory.Exists("./input"))
@@ -190,7 +183,7 @@ namespace ResourceCreatorv2
             }
 
             Console.ForegroundColor = ConsoleColor.Green;
-            convertForm.LogMessage("congrats you made it!");
+            Console.WriteLine("congrats you made it!");
             Console.ForegroundColor = ConsoleColor.White;
 
             convertForm.convertComplete();

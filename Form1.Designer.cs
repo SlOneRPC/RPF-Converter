@@ -34,36 +34,17 @@
             this.replacebtn = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.addongroup = new System.Windows.Forms.GroupBox();
+            this.errorlbl = new System.Windows.Forms.Label();
+            this.settingsbtn = new System.Windows.Forms.Button();
             this.startbtn = new System.Windows.Forms.Button();
             this.fileslist = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.inputpanel = new System.Windows.Forms.Panel();
-            this.convertbtn = new System.Windows.Forms.Button();
-            this.browseBtn = new System.Windows.Forms.Button();
-            this.errorlbl = new System.Windows.Forms.Label();
-            this.namelbl = new System.Windows.Forms.Label();
-            this.rootDirtxb = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.nametxb = new System.Windows.Forms.TextBox();
-            this.logpanel = new System.Windows.Forms.Panel();
-            this.label5 = new System.Windows.Forms.Label();
-            this.logtxtbx = new System.Windows.Forms.TextBox();
             this.fileTicker = new System.Windows.Forms.Timer(this.components);
             this.enginebtn = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.modkitbtn = new System.Windows.Forms.Button();
             this.resizerbtn = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.minAcceptableTextureMem = new System.Windows.Forms.NumericUpDown();
-            this.label6 = new System.Windows.Forms.Label();
-            this.minFileResizeSel = new System.Windows.Forms.NumericUpDown();
             this.addongroup.SuspendLayout();
-            this.inputpanel.SuspendLayout();
-            this.logpanel.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minAcceptableTextureMem)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.minFileResizeSel)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -108,17 +89,40 @@
             // 
             // addongroup
             // 
+            this.addongroup.Controls.Add(this.errorlbl);
+            this.addongroup.Controls.Add(this.settingsbtn);
             this.addongroup.Controls.Add(this.startbtn);
             this.addongroup.Controls.Add(this.fileslist);
             this.addongroup.Controls.Add(this.label3);
-            this.addongroup.Controls.Add(this.inputpanel);
-            this.addongroup.Controls.Add(this.logpanel);
             this.addongroup.Location = new System.Drawing.Point(13, 117);
             this.addongroup.Name = "addongroup";
             this.addongroup.Size = new System.Drawing.Size(556, 256);
             this.addongroup.TabIndex = 4;
             this.addongroup.TabStop = false;
             this.addongroup.Text = "Addon Vehicles";
+            // 
+            // errorlbl
+            // 
+            this.errorlbl.AutoSize = true;
+            this.errorlbl.Font = new System.Drawing.Font("Rockwell", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.errorlbl.ForeColor = System.Drawing.Color.Red;
+            this.errorlbl.Location = new System.Drawing.Point(223, 210);
+            this.errorlbl.Name = "errorlbl";
+            this.errorlbl.Size = new System.Drawing.Size(57, 21);
+            this.errorlbl.TabIndex = 8;
+            this.errorlbl.Text = "Error";
+            this.errorlbl.Visible = false;
+            // 
+            // settingsbtn
+            // 
+            this.settingsbtn.Font = new System.Drawing.Font("Rockwell", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.settingsbtn.Location = new System.Drawing.Point(412, 199);
+            this.settingsbtn.Name = "settingsbtn";
+            this.settingsbtn.Size = new System.Drawing.Size(115, 40);
+            this.settingsbtn.TabIndex = 10;
+            this.settingsbtn.Text = "🔧";
+            this.settingsbtn.UseVisualStyleBackColor = true;
+            this.settingsbtn.Click += new System.EventHandler(this.settingsbtn_Click);
             // 
             // startbtn
             // 
@@ -133,11 +137,12 @@
             // 
             // fileslist
             // 
-            this.fileslist.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.fileslist.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fileslist.FormattingEnabled = true;
+            this.fileslist.ItemHeight = 21;
             this.fileslist.Location = new System.Drawing.Point(6, 42);
             this.fileslist.Name = "fileslist";
-            this.fileslist.Size = new System.Drawing.Size(211, 147);
+            this.fileslist.Size = new System.Drawing.Size(521, 151);
             this.fileslist.TabIndex = 7;
             // 
             // label3
@@ -148,129 +153,6 @@
             this.label3.Size = new System.Drawing.Size(83, 13);
             this.label3.TabIndex = 1;
             this.label3.Text = "Files to Convert:";
-            // 
-            // inputpanel
-            // 
-            this.inputpanel.Controls.Add(this.convertbtn);
-            this.inputpanel.Controls.Add(this.browseBtn);
-            this.inputpanel.Controls.Add(this.errorlbl);
-            this.inputpanel.Controls.Add(this.namelbl);
-            this.inputpanel.Controls.Add(this.rootDirtxb);
-            this.inputpanel.Controls.Add(this.label4);
-            this.inputpanel.Controls.Add(this.nametxb);
-            this.inputpanel.Location = new System.Drawing.Point(219, 25);
-            this.inputpanel.Name = "inputpanel";
-            this.inputpanel.Size = new System.Drawing.Size(327, 225);
-            this.inputpanel.TabIndex = 6;
-            this.inputpanel.Visible = false;
-            // 
-            // convertbtn
-            // 
-            this.convertbtn.Font = new System.Drawing.Font("Rockwell", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.convertbtn.Location = new System.Drawing.Point(70, 75);
-            this.convertbtn.Name = "convertbtn";
-            this.convertbtn.Size = new System.Drawing.Size(175, 40);
-            this.convertbtn.TabIndex = 4;
-            this.convertbtn.Text = "Apply";
-            this.convertbtn.UseVisualStyleBackColor = true;
-            this.convertbtn.Click += new System.EventHandler(this.convertbtn_Click);
-            // 
-            // browseBtn
-            // 
-            this.browseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.browseBtn.Location = new System.Drawing.Point(251, 142);
-            this.browseBtn.Name = "browseBtn";
-            this.browseBtn.Size = new System.Drawing.Size(68, 29);
-            this.browseBtn.TabIndex = 8;
-            this.browseBtn.Text = "Browse";
-            this.browseBtn.UseVisualStyleBackColor = true;
-            this.browseBtn.Visible = false;
-            this.browseBtn.Click += new System.EventHandler(this.browseBtn_Click);
-            // 
-            // errorlbl
-            // 
-            this.errorlbl.BackColor = System.Drawing.Color.Transparent;
-            this.errorlbl.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.errorlbl.Font = new System.Drawing.Font("Rockwell", 11.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.errorlbl.ForeColor = System.Drawing.Color.Red;
-            this.errorlbl.Location = new System.Drawing.Point(0, 204);
-            this.errorlbl.Name = "errorlbl";
-            this.errorlbl.Size = new System.Drawing.Size(327, 21);
-            this.errorlbl.TabIndex = 5;
-            this.errorlbl.Text = "error msg";
-            this.errorlbl.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.errorlbl.Visible = false;
-            // 
-            // namelbl
-            // 
-            this.namelbl.AutoSize = true;
-            this.namelbl.Enabled = false;
-            this.namelbl.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.namelbl.Location = new System.Drawing.Point(11, 16);
-            this.namelbl.Name = "namelbl";
-            this.namelbl.Size = new System.Drawing.Size(153, 19);
-            this.namelbl.TabIndex = 3;
-            this.namelbl.Text = "Input vehicle name:";
-            // 
-            // rootDirtxb
-            // 
-            this.rootDirtxb.Enabled = false;
-            this.rootDirtxb.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.rootDirtxb.Location = new System.Drawing.Point(15, 144);
-            this.rootDirtxb.Multiline = true;
-            this.rootDirtxb.Name = "rootDirtxb";
-            this.rootDirtxb.Size = new System.Drawing.Size(230, 24);
-            this.rootDirtxb.TabIndex = 6;
-            this.rootDirtxb.Visible = false;
-            this.rootDirtxb.TextChanged += new System.EventHandler(this.rootDirtxb_TextChanged);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Rockwell", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(11, 118);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(186, 19);
-            this.label4.TabIndex = 6;
-            this.label4.Text = "Vehicles Root Directory:";
-            this.label4.Visible = false;
-            // 
-            // nametxb
-            // 
-            this.nametxb.Enabled = false;
-            this.nametxb.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.nametxb.Location = new System.Drawing.Point(15, 40);
-            this.nametxb.Name = "nametxb";
-            this.nametxb.Size = new System.Drawing.Size(298, 29);
-            this.nametxb.TabIndex = 2;
-            // 
-            // logpanel
-            // 
-            this.logpanel.Controls.Add(this.label5);
-            this.logpanel.Controls.Add(this.logtxtbx);
-            this.logpanel.Location = new System.Drawing.Point(219, 14);
-            this.logpanel.Name = "logpanel";
-            this.logpanel.Size = new System.Drawing.Size(337, 236);
-            this.logpanel.TabIndex = 9;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(18, 8);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(45, 19);
-            this.label5.TabIndex = 10;
-            this.label5.Text = "Log:";
-            // 
-            // logtxtbx
-            // 
-            this.logtxtbx.Enabled = false;
-            this.logtxtbx.Location = new System.Drawing.Point(18, 27);
-            this.logtxtbx.Multiline = true;
-            this.logtxtbx.Name = "logtxtbx";
-            this.logtxtbx.Size = new System.Drawing.Size(301, 205);
-            this.logtxtbx.TabIndex = 6;
             // 
             // fileTicker
             // 
@@ -309,79 +191,11 @@
             this.resizerbtn.UseVisualStyleBackColor = true;
             this.resizerbtn.Click += new System.EventHandler(this.resizerbtn_Click);
             // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.label7);
-            this.groupBox1.Controls.Add(this.minAcceptableTextureMem);
-            this.groupBox1.Controls.Add(this.label6);
-            this.groupBox1.Controls.Add(this.minFileResizeSel);
-            this.groupBox1.Location = new System.Drawing.Point(12, 379);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(557, 68);
-            this.groupBox1.TabIndex = 8;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Resizing Settings";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(216, 20);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(248, 13);
-            this.label7.TabIndex = 3;
-            this.label7.Text = "Min acceptable texture (image) memory usage (MB)";
-            // 
-            // minAcceptableTextureMem
-            // 
-            this.minAcceptableTextureMem.DecimalPlaces = 1;
-            this.minAcceptableTextureMem.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.minAcceptableTextureMem.Location = new System.Drawing.Point(219, 39);
-            this.minAcceptableTextureMem.Name = "minAcceptableTextureMem";
-            this.minAcceptableTextureMem.Size = new System.Drawing.Size(114, 20);
-            this.minAcceptableTextureMem.TabIndex = 2;
-            this.minAcceptableTextureMem.Value = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(10, 20);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(200, 13);
-            this.label6.TabIndex = 1;
-            this.label6.Text = "Min uncompressed file size to resize (MB)";
-            // 
-            // minFileResizeSel
-            // 
-            this.minFileResizeSel.DecimalPlaces = 1;
-            this.minFileResizeSel.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.minFileResizeSel.Location = new System.Drawing.Point(10, 39);
-            this.minFileResizeSel.Name = "minFileResizeSel";
-            this.minFileResizeSel.Size = new System.Drawing.Size(114, 20);
-            this.minFileResizeSel.TabIndex = 0;
-            this.minFileResizeSel.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            // 
             // ResourceCreator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(577, 450);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(577, 375);
             this.Controls.Add(this.resizerbtn);
             this.Controls.Add(this.modkitbtn);
             this.Controls.Add(this.enginebtn);
@@ -396,14 +210,6 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.addongroup.ResumeLayout(false);
             this.addongroup.PerformLayout();
-            this.inputpanel.ResumeLayout(false);
-            this.inputpanel.PerformLayout();
-            this.logpanel.ResumeLayout(false);
-            this.logpanel.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.minAcceptableTextureMem)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.minFileResizeSel)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -417,29 +223,15 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox addongroup;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button convertbtn;
-        private System.Windows.Forms.Label namelbl;
-        private System.Windows.Forms.TextBox nametxb;
-        private System.Windows.Forms.Label errorlbl;
-        private System.Windows.Forms.Panel inputpanel;
         private System.Windows.Forms.Timer fileTicker;
         private System.Windows.Forms.ListBox fileslist;
         private System.Windows.Forms.Button enginebtn;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox rootDirtxb;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
-        private System.Windows.Forms.Button browseBtn;
         private System.Windows.Forms.Button modkitbtn;
         private System.Windows.Forms.Button resizerbtn;
         private System.Windows.Forms.Button startbtn;
-        private System.Windows.Forms.Panel logpanel;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox logtxtbx;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.NumericUpDown minAcceptableTextureMem;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.NumericUpDown minFileResizeSel;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button settingsbtn;
+        private System.Windows.Forms.Label errorlbl;
     }
 }
 

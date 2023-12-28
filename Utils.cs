@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using CodeWalker.GameFiles;
 using CodeWalker.Utils;
+using static System.ActivationContext;
+
 namespace ResourceCreatorv2
 {
     public static class Utils
@@ -94,6 +96,14 @@ namespace ResourceCreatorv2
                 }
             }
             Directory.Delete(source, true);
+        }
+
+        public static void MoveFile(string from, string to)
+        {
+            File.Move(from, to);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Moved file '{0}' -> {1}.", from, to);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void WriteOutputFile(Dictionary<string, string> modelNames)
