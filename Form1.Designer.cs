@@ -96,7 +96,7 @@
             this.addongroup.Controls.Add(this.label3);
             this.addongroup.Location = new System.Drawing.Point(13, 117);
             this.addongroup.Name = "addongroup";
-            this.addongroup.Size = new System.Drawing.Size(556, 256);
+            this.addongroup.Size = new System.Drawing.Size(556, 246);
             this.addongroup.TabIndex = 4;
             this.addongroup.TabStop = false;
             this.addongroup.Text = "Addon Vehicles";
