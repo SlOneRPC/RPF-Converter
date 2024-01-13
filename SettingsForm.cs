@@ -17,6 +17,9 @@ namespace ResourceCreatorv2
             InitializeComponent();
             MaximizeBox = false;
             MinimizeBox = false;
+
+            minFileResizeSel.Value = (decimal)ResourceCreator.minFileResize;
+            minAcceptableTextureMem.Value = (decimal)ResourceCreator.minAcceptableTexureSize;
         }
 
         public string getRootDir()
@@ -45,6 +48,12 @@ namespace ResourceCreatorv2
                     rootDirtxb.Text = fbd.SelectedPath;
                 }
             }
+        }
+
+        private void SettingsForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ResourceCreator.minAcceptableTexureSize = getMinAcceptableTextureMem();
+            ResourceCreator.minFileResize = getMinFileResize();
         }
     }
 }

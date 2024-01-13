@@ -142,10 +142,11 @@ namespace ResourceCreatorv2
                         Console.WriteLine("Skipped {0}, Memory size {1}MB, Dimensions {2}", texture.Value.Name, Utils.ConvertBytesToMegabytes(texture.Value.MemoryUsage).ToString("#.##"), texture.Value.Height + "x" + texture.Value.Width);
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Could not resize -> " + texture.Value.Name);
+                    Console.WriteLine(e.Message);
                     Console.ForegroundColor = ConsoleColor.White;
                     dict.Add(texture.Key, texture.Value);
                 }

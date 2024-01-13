@@ -19,6 +19,9 @@ namespace ResourceCreatorv2
 
     public partial class ResourceCreator : Form
     {
+        public static float minFileResize = 10;
+        public static float minAcceptableTexureSize = 5;
+
         static bool converting = false;
         static string input = null;
 
@@ -53,22 +56,12 @@ namespace ResourceCreatorv2
 
         public float getMinFileResize()
         {
-            float output = 0;
-            addonbtn.Invoke(new MethodInvoker(delegate
-            {
-                output = settingForm.getMinFileResize();
-            }));
-            return output;
+            return minFileResize;
         }
 
         public float getMinAcceptableTextureMem()
         {
-            float output = 0;
-            addonbtn.Invoke(new MethodInvoker(delegate
-            {
-                output = settingForm.getMinAcceptableTextureMem();
-            }));
-            return output;
+            return minAcceptableTexureSize;
         }
 
         public string requestInput(string msg, string defaultValue = "")
@@ -301,7 +294,8 @@ namespace ResourceCreatorv2
 
         private void settingsbtn_Click(object sender, EventArgs e)
         {
-            settingForm.Show();
+            settingForm.ShowDialog();
+            settingForm = new SettingsForm();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace ResourceCreatorv2
         {
             var cmdArgs = Environment.GetCommandLineArgs();
 
-            if (cmdArgs.Length < 1) // run winforms app
+            if (cmdArgs.Length <= 1) // run winforms app
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
